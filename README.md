@@ -8,14 +8,6 @@ Transcode audio, remux between containers, or extract audio/video/subtitle track
 ![Portable](https://img.shields.io/badge/Install-Not%20Required-success)
 ![Theme](https://img.shields.io/badge/Theme-Customizable-lightgrey)
 
-![Stars](https://img.shields.io/github/stars/syncromoose/Moosetracks)
-![Forks](https://img.shields.io/github/forks/syncromoose/Moosetracks)
-![Issues](https://img.shields.io/github/issues/syncromoose/Moosetracks)
-![Closed Issues](https://img.shields.io/github/issues-closed/syncromoose/Moosetracks)
-![Closed PRs](https://img.shields.io/github/issues-pr-closed/syncromoose/Moosetracks)
-![Version](https://img.shields.io/github/v/release/syncromoose/Moosetracks)
-![Downloads](https://img.shields.io/github/downloads/syncromoose/Moosetracks/total)
-
 ## Screenshots
 
 - Core Views
