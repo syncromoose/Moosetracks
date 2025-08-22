@@ -2,57 +2,114 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="{DynamicResource AppBackground}"
-             Height="700" Width="922">
+             Height="750" Width="922">
+
+    <UserControl.Resources>
+        <!-- GroupBox: header inside the box, one clean outer border -->
+        <Style x:Key="SectionGroupBox" TargetType="GroupBox">
+            <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
+            <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Border CornerRadius="6"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="True">
+                            <!-- Scoped styles so inner controls don't draw extra outlines -->
+                            <Border.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
+                                </Style>
+                                <Style TargetType="ListBox">
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
+                                </Style>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
+                                </Style>
+                                <Style TargetType="ProgressBar">
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource BoxesBorderBrush}"/>
+                                </Style>
+                            </Border.Resources>
+
+                            <!-- Header INSIDE box + content below -->
+                            <Grid Margin="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <ContentPresenter Grid.Row="0"
+                                                  ContentSource="Header"
+                                                  RecognizesAccessKey="True"
+                                                  Margin="0,0,0,6"
+                                                  TextElement.Foreground="{DynamicResource AppForeground}"
+                                                  TextElement.FontWeight="Bold"/>
+
+                                <ContentPresenter Grid.Row="1" ContentSource="Content"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="Auto" MinHeight="286"/>
+            <RowDefinition Height="*"/>
+            <!-- Taller bottom row so FFmpeg area breathes -->
+            <RowDefinition Height="Auto" MinHeight="320"/>
         </Grid.RowDefinitions>
 
         <!-- Left Panel -->
         <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" Margin="0,0,15,0">
+
             <!-- Input File -->
-            <GroupBox Header="Input File" Foreground="{DynamicResource AppForeground}" 
-                      Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                      BorderThickness="1" Margin="0,0,0,10">
-                <DockPanel Margin="5">
-                    <TextBox x:Name="InputFilePathBox" Width="400" IsReadOnly="True" 
-                             Foreground="{DynamicResource AppForeground}" Background="{DynamicResource AppBackground}" 
-                             BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1"/>
-                    <Button x:Name="BrowseInputButton" Content="Browse" Width="80" Margin="5,0,0,0" Click="BrowseInputButton_Click"/>
+            <GroupBox Header="Input File" Style="{StaticResource SectionGroupBox}">
+                <DockPanel>
+                    <TextBox x:Name="InputFilePathBox" Width="400" IsReadOnly="True"/>
+                    <Button x:Name="BrowseInputButton" Content="Browse" Width="80" Margin="8,0,0,0"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            Click="BrowseInputButton_Click"/>
                 </DockPanel>
             </GroupBox>
 
             <!-- File List -->
-            <GroupBox Header="File List" Foreground="{DynamicResource AppForeground}" 
-                      Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                      BorderThickness="1" Margin="0,0,0,10">
-                <ListBox x:Name="ExtractionOutputBox" Height="120" Background="{DynamicResource AppBackground}" 
-                         Foreground="{DynamicResource AppForeground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                         BorderThickness="1" SelectionMode="Multiple" SelectionChanged="ExtractionOutputBox_SelectionChanged" Margin="5"/>
+            <GroupBox Header="File List" Style="{StaticResource SectionGroupBox}">
+                <ListBox x:Name="ExtractionOutputBox" Height="120"
+                         SelectionMode="Multiple"
+                         SelectionChanged="ExtractionOutputBox_SelectionChanged"/>
             </GroupBox>
 
             <!-- Output Path -->
-            <GroupBox Header="Output Path" Foreground="{DynamicResource AppForeground}" 
-                      Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                      BorderThickness="1" Margin="0,0,0,10">
-                <DockPanel Margin="5">
-                    <TextBox x:Name="OutputPathBox" Width="400" IsReadOnly="True" 
-                             Foreground="{DynamicResource AppForeground}" Background="{DynamicResource AppBackground}" 
-                             BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1"/>
-                    <Button x:Name="BrowseOutputButton" Content="Browse" Width="80" Margin="5,0,0,0" Click="BrowseOutputButton_Click"/>
+            <GroupBox Header="Output Path" Style="{StaticResource SectionGroupBox}">
+                <DockPanel>
+                    <TextBox x:Name="OutputPathBox" Width="400" IsReadOnly="True"/>
+                    <Button x:Name="BrowseOutputButton" Content="Browse" Width="80" Margin="8,0,0,0"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            Click="BrowseOutputButton_Click"/>
                 </DockPanel>
             </GroupBox>
 
             <!-- Frame Rate Conversion -->
-            <GroupBox Header="Frame Rate Conversion" Foreground="{DynamicResource AppForeground}" 
-                      Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                      BorderThickness="1" Margin="0,0,0,10">
-                <Grid Margin="5">
+            <GroupBox Header="Frame Rate Conversion" Style="{StaticResource SectionGroupBox}">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="2*"/>
@@ -64,11 +121,11 @@
 
                     <!-- Left Column: Checkboxes -->
                     <StackPanel Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical">
-                        <CheckBox x:Name="EnableFrameRateChangeCheckBox" Content="Enable Frame Rate Change" 
-                                  Foreground="{DynamicResource AppForeground}" 
-                                  Checked="EnableFrameRateChangeCheckBox_Checked" 
+                        <CheckBox x:Name="EnableFrameRateChangeCheckBox" Content="Enable Frame Rate Change"
+                                  Foreground="{DynamicResource AppForeground}"
+                                  Checked="EnableFrameRateChangeCheckBox_Checked"
                                   Unchecked="EnableFrameRateChangeCheckBox_Unchecked" Margin="0,0,0,5"/>
-                        <CheckBox x:Name="PreservePitchCheckbox" Content="Preserve Pitch" 
+                        <CheckBox x:Name="PreservePitchCheckbox" Content="Preserve Pitch"
                                   Foreground="{DynamicResource AppForeground}" IsEnabled="False"/>
                     </StackPanel>
 
@@ -83,7 +140,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Source FPS:" VerticalAlignment="Center" 
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Source FPS:" VerticalAlignment="Center"
                                    Foreground="{DynamicResource AppForeground}" Margin="0,0,5,0"/>
                         <ComboBox Grid.Row="0" Grid.Column="1" x:Name="SourceFrameRateComboBox" Width="80" IsEnabled="False">
                             <ComboBoxItem Content="23.976"/>
@@ -93,7 +150,7 @@
                             <ComboBoxItem Content="30"/>
                         </ComboBox>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Target FPS:" VerticalAlignment="Center" 
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Target FPS:" VerticalAlignment="Center"
                                    Foreground="{DynamicResource AppForeground}" Margin="0,0,5,0"/>
                         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="TargetFrameRateComboBox" Width="80" IsEnabled="False">
                             <ComboBoxItem Content="23.976"/>
@@ -110,10 +167,8 @@
         <!-- Right Panel -->
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical">
             <!-- File Info -->
-            <GroupBox Header="File Info" Foreground="{DynamicResource AppForeground}" 
-                      Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                      BorderThickness="1" Margin="0,0,0,10">
-                <Grid Margin="5">
+            <GroupBox Header="File Info" Style="{StaticResource SectionGroupBox}">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="*"/>
@@ -146,10 +201,8 @@
             </GroupBox>
 
             <!-- Format and Gain -->
-            <GroupBox Header="Format and Gain" Foreground="{DynamicResource AppForeground}" 
-                      Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                      BorderThickness="1">
-                <StackPanel Margin="5">
+            <GroupBox Header="Format and Gain" Style="{StaticResource SectionGroupBox}">
+                <StackPanel>
                     <DockPanel Margin="0,0,0,5">
                         <TextBlock Text="Format:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
                         <ComboBox x:Name="FormatComboBox" Width="98" Height="22">
@@ -165,31 +218,32 @@
                             <ComboBoxItem Content="opus"/>
                         </ComboBox>
                         <TextBlock Text="Bitrate:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                        <ComboBox x:Name="BitrateComboBox" Width="90" Margin="5"/>
+                        <ComboBox x:Name="BitrateComboBox" Width="90" Margin="5,0,0,0"/>
                     </DockPanel>
                     <DockPanel Margin="0,0,0,5">
                         <TextBlock Text="Gain (dB):" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBox x:Name="GainBox" Width="50" Text="0" Foreground="{DynamicResource AppForeground}" 
-                                 Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                                 BorderThickness="1"/>
+                        <TextBox x:Name="GainBox" Width="50" Text="0"/>
                     </DockPanel>
                     <CheckBox x:Name="DownmixCheckBox" Content="Downmix to Stereo" Foreground="{DynamicResource AppForeground}"/>
                 </StackPanel>
             </GroupBox>
 
-            <Button x:Name="TranscodeTracksButton" Content="Start Transcoding" Width="200" Height="30" Margin="0,10,0,0" Click="TranscodeTracksButton_Click"/>
+            <Button x:Name="TranscodeTracksButton" Content="Start Transcoding" Width="200" Height="30" Margin="0,10,0,0"
+                    Click="TranscodeTracksButton_Click"/>
         </StackPanel>
 
         <!-- Bottom FFmpeg Output -->
-        <StackPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0">
-            <TextBlock Text="FFmpeg Progress:" Foreground="{DynamicResource AppForeground}" Margin="0,0,0,5"/>
-            <ProgressBar x:Name="FFmpegProgressBar" Height="20" Minimum="0" Maximum="100" Value="0" 
-                         Foreground="{DynamicResource AppBorderBrush}" Background="{DynamicResource AppBackground}" 
-                         BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1"/>
-            <TextBlock Text="FFmpeg Output:" Foreground="{DynamicResource AppForeground}" Margin="0,10,0,5"/>
-            <TextBox x:Name="FFmpegOutputBox" Height="150" Background="{DynamicResource AppBackground}" 
-                     Foreground="{DynamicResource AppForeground}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                     BorderThickness="1" IsReadOnly="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
-        </StackPanel>
+        <GroupBox Header="FFmpeg Output" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
+                  Style="{StaticResource SectionGroupBox}"
+                  Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Text="Progress:" Foreground="{DynamicResource AppForeground}" Margin="0,0,0,5"/>
+                <ProgressBar x:Name="FFmpegProgressBar" Height="20" Minimum="0" Maximum="100" Value="0"/>
+
+                <TextBlock Text="Output Log:" Foreground="{DynamicResource AppForeground}" Margin="0,10,0,5"/>
+                <TextBox x:Name="FFmpegOutputBox" Height="180"
+                         IsReadOnly="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
+            </StackPanel>
+        </GroupBox>
     </Grid>
 </UserControl>

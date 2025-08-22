@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:MooseTracks.Views"
-        Title="MooseTracks" Height="750" Width="950" ResizeMode="NoResize"
+        Title="MooseTracks" Height="840" Width="950" ResizeMode="NoResize"
         Background="{DynamicResource AppBackground}"
         Foreground="{DynamicResource AppForeground}">
     <Window.Resources>

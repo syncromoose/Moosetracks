@@ -1,0 +1,75 @@
+﻿<!-- Theme.xaml (in project root) -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Placeholder brushes: replaced at runtime by your code -->
+    <SolidColorBrush x:Key="AppBackground" Color="Transparent"/>
+    <SolidColorBrush x:Key="AppForeground" Color="Transparent"/>
+    <SolidColorBrush x:Key="AppBorderBrush" Color="Transparent"/>
+
+    <SolidColorBrush x:Key="BoxesBorderBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="BoxesBackgroundBrush" Color="Transparent" Opacity="0.0"/>
+    <Color x:Key="BoxesColor">#00000000</Color>
+
+    <!-- Make EVERY GroupBox use the clean look (no x:Key -> global) -->
+    <Style TargetType="GroupBox">
+        <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
+        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GroupBox">
+                    <Grid>
+                        <!-- Outer rounded panel -->
+                        <Border CornerRadius="6"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Background="{TemplateBinding Background}"
+                    Padding="12" Margin="0,10,0,0"/>
+
+                        <!-- Header chip -->
+                        <Border Background="{DynamicResource AppBackground}"
+        TextElement.Foreground="{DynamicResource AppForeground}"
+        Padding="4,0"
+        HorizontalAlignment="Left"
+        Margin="12,0,0,0">
+                            <ContentPresenter ContentSource="Header"
+                    Margin="0"
+                    VerticalAlignment="Center"/>
+                        </Border>
+
+
+                        <!-- Content -->
+                        <ContentPresenter Margin="12,18,12,12"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Reusable border section (e.g., FFmpeg panel) -->
+    <Style x:Key="SectionBorder" TargetType="Border">
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+        <Setter Property="Padding" Value="12"/>
+        <Setter Property="Margin" Value="0,10,0,0"/>
+    </Style>
+
+    <!-- Optional: remove inner borders inside sections for a single, clean outline -->
+    <Style TargetType="TextBox">
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+    </Style>
+    <Style TargetType="ComboBox">
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+    </Style>
+    <Style TargetType="ListBox">
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+    </Style>
+
+</ResourceDictionary>

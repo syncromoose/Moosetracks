@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Collections.Generic; // NEW: for List<T>
 
 namespace MooseTracks.Views
 {
@@ -15,15 +16,16 @@ namespace MooseTracks.Views
         private string configFile => Path.Combine(settingsFolder, "settings.cfg");
         private string logFile => Path.Combine(settingsFolder, "log.txt");
 
-
         // Theme colors as class-level fields
         private Color backgroundColor = Colors.Black;
         private Color foregroundColor = Colors.White;
         private Color borderColor = Color.FromRgb(255, 165, 0);
 
+        // NEW: Boxes colour (drives all GroupBoxes + FFmpeg area)
+        private Color boxesColor = Color.FromRgb(59, 130, 246); // #3B82F6 default
+        private double boxesFillPercent = 10.0; // 0..100 -> BoxesBackgroundBrush.Opacity
 
         private bool isInitialized; // Flag to prevent premature event handling
-
 
         public SettingsPage()
         {
@@ -40,9 +42,12 @@ namespace MooseTracks.Views
                 Log("LoadThemeList completed");
                 LoadCurrentTheme();
                 Log("LoadCurrentTheme completed");
-                InitializeSliders();
+                InitializeSliders();              // includes Boxes sliders now
                 Log("InitializeSliders completed");
-                isInitialized = true; // Set flag after initialization
+                ApplyTheme(backgroundColor, foregroundColor, borderColor);
+                ApplyBoxesTheme(boxesColor, boxesFillPercent);
+
+                isInitialized = true; // set AFTER we’ve applied once
             }
             catch (Exception ex)
             {
@@ -52,31 +57,44 @@ namespace MooseTracks.Views
             Log("Exiting SettingsPage constructor");
         }
 
-
-
         private void InitializeSliders()
         {
             try
             {
                 Log("Entering InitializeSliders");
-                if (BackgroundRSlider != null) BackgroundRSlider.Value = backgroundColor.R;
-                else Log("BackgroundRSlider is null");
-                if (BackgroundGSlider != null) BackgroundGSlider.Value = backgroundColor.G;
-                else Log("BackgroundGSlider is null");
-                if (BackgroundBSlider != null) BackgroundBSlider.Value = backgroundColor.B;
-                else Log("BackgroundBSlider is null");
-                if (ForegroundRSlider != null) ForegroundRSlider.Value = foregroundColor.R;
-                else Log("ForegroundRSlider is null");
-                if (ForegroundGSlider != null) ForegroundGSlider.Value = foregroundColor.G;
-                else Log("ForegroundGSlider is null");
-                if (ForegroundBSlider != null) ForegroundBSlider.Value = foregroundColor.B;
-                else Log("ForegroundBSlider is null");
-                if (BorderRSlider != null) BorderRSlider.Value = borderColor.R;
-                else Log("BorderRSlider is null");
-                if (BorderGSlider != null) BorderGSlider.Value = borderColor.G;
-                else Log("BorderGSlider is null");
-                if (BorderBSlider != null) BorderBSlider.Value = borderColor.B;
-                else Log("BorderBSlider is null");
+
+                // Try to read current app-wide resources to seed fields (so the UI reflects the active theme)
+                if (Application.Current.Resources["AppBackground"] is SolidColorBrush appBg) backgroundColor = appBg.Color;
+                if (Application.Current.Resources["AppForeground"] is SolidColorBrush appFg) foregroundColor = appFg.Color;
+                if (Application.Current.Resources["AppBorderBrush"] is SolidColorBrush appBd) borderColor = appBd.Color;
+
+                // NEW: Also seed Boxes from resources if present
+                if (Application.Current.Resources["BoxesBorderBrush"] is SolidColorBrush b) boxesColor = b.Color;
+                if (Application.Current.Resources["BoxesBackgroundBrush"] is SolidColorBrush bg)
+                {
+                    // keep colour consistent with border; user controls fill % separately
+                    boxesFillPercent = Math.Round(bg.Opacity * 100.0, 1);
+                }
+
+                // Existing sliders
+                if (BackgroundRSlider != null) BackgroundRSlider.Value = backgroundColor.R; else Log("BackgroundRSlider is null");
+                if (BackgroundGSlider != null) BackgroundGSlider.Value = backgroundColor.G; else Log("BackgroundGSlider is null");
+                if (BackgroundBSlider != null) BackgroundBSlider.Value = backgroundColor.B; else Log("BackgroundBSlider is null");
+
+                if (ForegroundRSlider != null) ForegroundRSlider.Value = foregroundColor.R; else Log("ForegroundRSlider is null");
+                if (ForegroundGSlider != null) ForegroundGSlider.Value = foregroundColor.G; else Log("ForegroundGSlider is null");
+                if (ForegroundBSlider != null) ForegroundBSlider.Value = foregroundColor.B; else Log("ForegroundBSlider is null");
+
+                if (BorderRSlider != null) BorderRSlider.Value = borderColor.R; else Log("BorderRSlider is null");
+                if (BorderGSlider != null) BorderGSlider.Value = borderColor.G; else Log("BorderGSlider is null");
+                if (BorderBSlider != null) BorderBSlider.Value = borderColor.B; else Log("BorderBSlider is null");
+
+                // NEW: Boxes sliders
+                if (BoxesRSlider != null) BoxesRSlider.Value = boxesColor.R; else Log("BoxesRSlider is null");
+                if (BoxesGSlider != null) BoxesGSlider.Value = boxesColor.G; else Log("BoxesGSlider is null");
+                if (BoxesBSlider != null) BoxesBSlider.Value = boxesColor.B; else Log("BoxesBSlider is null");
+                if (BoxesFillSlider != null) BoxesFillSlider.Value = boxesFillPercent; else Log("BoxesFillSlider is null");
+
                 Log("Exiting InitializeSliders");
             }
             catch (Exception ex)
@@ -229,7 +247,6 @@ namespace MooseTracks.Views
             }
         }
 
-
         private void LoadCurrentTheme()
         {
             try
@@ -317,12 +334,9 @@ namespace MooseTracks.Views
                         if (rgb != null)
                         {
                             backgroundColor = Color.FromRgb(rgb.Value.r, rgb.Value.g, rgb.Value.b);
-                            if (BackgroundRSlider != null) BackgroundRSlider.Value = rgb.Value.r;
-                            else Log("BackgroundRSlider is null in LoadThemeFromFile");
-                            if (BackgroundGSlider != null) BackgroundGSlider.Value = rgb.Value.g;
-                            else Log("BackgroundGSlider is null in LoadThemeFromFile");
-                            if (BackgroundBSlider != null) BackgroundBSlider.Value = rgb.Value.b;
-                            else Log("BackgroundBSlider is null in LoadThemeFromFile");
+                            if (BackgroundRSlider != null) BackgroundRSlider.Value = rgb.Value.r; else Log("BackgroundRSlider is null in LoadThemeFromFile");
+                            if (BackgroundGSlider != null) BackgroundGSlider.Value = rgb.Value.g; else Log("BackgroundGSlider is null in LoadThemeFromFile");
+                            if (BackgroundBSlider != null) BackgroundBSlider.Value = rgb.Value.b; else Log("BackgroundBSlider is null in LoadThemeFromFile");
                             Log($"Loaded Background: {rgb.Value.r},{rgb.Value.g},{rgb.Value.b}");
                         }
                     }
@@ -332,12 +346,9 @@ namespace MooseTracks.Views
                         if (rgb != null)
                         {
                             foregroundColor = Color.FromRgb(rgb.Value.r, rgb.Value.g, rgb.Value.b);
-                            if (ForegroundRSlider != null) ForegroundRSlider.Value = rgb.Value.r;
-                            else Log("ForegroundRSlider is null in LoadThemeFromFile");
-                            if (ForegroundGSlider != null) ForegroundGSlider.Value = rgb.Value.g;
-                            else Log("ForegroundGSlider is null in LoadThemeFromFile");
-                            if (ForegroundBSlider != null) ForegroundBSlider.Value = rgb.Value.b;
-                            else Log("ForegroundBSlider is null in LoadThemeFromFile");
+                            if (ForegroundRSlider != null) ForegroundRSlider.Value = rgb.Value.r; else Log("ForegroundRSlider is null in LoadThemeFromFile");
+                            if (ForegroundGSlider != null) ForegroundGSlider.Value = rgb.Value.g; else Log("ForegroundGSlider is null in LoadThemeFromFile");
+                            if (ForegroundBSlider != null) ForegroundBSlider.Value = rgb.Value.b; else Log("ForegroundBSlider is null in LoadThemeFromFile");
                             Log($"Loaded Foreground: {rgb.Value.r},{rgb.Value.g},{rgb.Value.b}");
                         }
                     }
@@ -347,16 +358,41 @@ namespace MooseTracks.Views
                         if (rgb != null)
                         {
                             borderColor = Color.FromRgb(rgb.Value.r, rgb.Value.g, rgb.Value.b);
-                            if (BorderRSlider != null) BorderRSlider.Value = rgb.Value.r;
-                            else Log("BorderRSlider is null in LoadThemeFromFile");
-                            if (BorderGSlider != null) BorderGSlider.Value = rgb.Value.g;
-                            else Log("BorderGSlider is null in LoadThemeFromFile");
-                            if (BorderBSlider != null) BorderBSlider.Value = rgb.Value.b;
-                            else Log("BorderBSlider is null in LoadThemeFromFile");
+                            if (BorderRSlider != null) BorderRSlider.Value = rgb.Value.r; else Log("BorderRSlider is null in LoadThemeFromFile");
+                            if (BorderGSlider != null) BorderGSlider.Value = rgb.Value.g; else Log("BorderGSlider is null in LoadThemeFromFile");
+                            if (BorderBSlider != null) BorderBSlider.Value = rgb.Value.b; else Log("BorderBSlider is null in LoadThemeFromFile");
                             Log($"Loaded BorderBrush: {rgb.Value.r},{rgb.Value.g},{rgb.Value.b}");
                         }
                     }
+                    // NEW: Boxes color + fill
+                    else if (line.StartsWith("BoxesColor=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var rgb = ParseRGB(line.Substring("BoxesColor=".Length));
+                        if (rgb != null)
+                        {
+                            boxesColor = Color.FromRgb(rgb.Value.r, rgb.Value.g, rgb.Value.b);
+                            if (BoxesRSlider != null) BoxesRSlider.Value = rgb.Value.r; else Log("BoxesRSlider is null in LoadThemeFromFile");
+                            if (BoxesGSlider != null) BoxesGSlider.Value = rgb.Value.g; else Log("BoxesGSlider is null in LoadThemeFromFile");
+                            if (BoxesBSlider != null) BoxesBSlider.Value = rgb.Value.b; else Log("BoxesBSlider is null in LoadThemeFromFile");
+                            Log($"Loaded BoxesColor: {rgb.Value.r},{rgb.Value.g},{rgb.Value.b}");
+                        }
+                    }
+                    else if (line.StartsWith("BoxesFill=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = line.Substring("BoxesFill=".Length).Trim();
+                        if (double.TryParse(val, out var pct))
+                        {
+                            boxesFillPercent = Math.Max(0, Math.Min(100, pct));
+                            if (BoxesFillSlider != null) BoxesFillSlider.Value = boxesFillPercent; else Log("BoxesFillSlider is null in LoadThemeFromFile");
+                            Log($"Loaded BoxesFill: {boxesFillPercent}%");
+                        }
+                    }
                 }
+
+                // Apply boxes to live resources immediately so other pages reflect it
+                ApplyTheme(backgroundColor, foregroundColor, borderColor);
+                ApplyBoxesTheme(boxesColor, boxesFillPercent);
+
                 Log($"Exiting LoadThemeFromFile: {themeFile}");
             }
             catch (Exception ex)
@@ -368,11 +404,7 @@ namespace MooseTracks.Views
 
         private void ColorSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (!isInitialized)
-            {
-                Log("ColorSlider_ValueChanged skipped: not initialized");
-                return;
-            }
+            if (!isInitialized) { Log("ColorSlider_ValueChanged skipped: not initialized"); return; }
             try
             {
                 Log("Entering ColorSlider_ValueChanged");
@@ -391,14 +423,47 @@ namespace MooseTracks.Views
                     (byte)(BorderGSlider?.Value ?? 165),
                     (byte)(BorderBSlider?.Value ?? 0)
                 );
+
+                // Apply immediately (replace, on UI thread)
+                ReplaceBrush("AppBackground", backgroundColor);
+                ReplaceBrush("AppForeground", foregroundColor);
+                ReplaceBrush("AppBorderBrush", borderColor);
+
                 Log("Exiting ColorSlider_ValueChanged");
             }
             catch (Exception ex)
             {
-                Log($"Error in ColorSlider_ValueChanged: {ex.Message}");
-                MessageBox.Show($"Error updating colors: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Log($"Error in ColorSlider_ValueChanged: {ex}");
+                MessageBox.Show($"Error updating colors: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+
+        // NEW: Handles Boxes R/G/B and Fill% sliders — applies immediately app-wide
+        private void BoxesColorSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (!isInitialized) { Log("BoxesColorSlider_ValueChanged skipped: not initialized"); return; }
+            try
+            {
+                Log("Entering BoxesColorSlider_ValueChanged");
+                boxesColor = Color.FromRgb(
+                    (byte)(BoxesRSlider?.Value ?? 59),
+                    (byte)(BoxesGSlider?.Value ?? 130),
+                    (byte)(BoxesBSlider?.Value ?? 246)
+                );
+                boxesFillPercent = (BoxesFillSlider?.Value ?? 10.0);
+                ApplyBoxesTheme(boxesColor, boxesFillPercent);
+                Log("Exiting BoxesColorSlider_ValueChanged");
+            }
+            catch (Exception ex)
+            {
+                Log($"Error in BoxesColorSlider_ValueChanged: {ex}");
+                MessageBox.Show($"Error updating box colour: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
 
         private void EnsureSettingsFolder()
         {
@@ -434,7 +499,6 @@ namespace MooseTracks.Views
             }
         }
 
-
         private void SaveThemeButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -454,10 +518,12 @@ namespace MooseTracks.Views
                 string themeFile = Path.Combine(settingsFolder, $"{themeName}.theme");
                 File.WriteAllLines(themeFile, new[]
                 {
-            $"Background={backgroundColor.R},{backgroundColor.G},{backgroundColor.B}",
-            $"Foreground={foregroundColor.R},{foregroundColor.G},{foregroundColor.B}",
-            $"BorderBrush={borderColor.R},{borderColor.G},{borderColor.B}"
-        });
+                    $"Background={backgroundColor.R},{backgroundColor.G},{backgroundColor.B}",
+                    $"Foreground={foregroundColor.R},{foregroundColor.G},{foregroundColor.B}",
+                    $"BorderBrush={borderColor.R},{borderColor.G},{borderColor.B}",
+                    $"BoxesColor={boxesColor.R},{boxesColor.G},{boxesColor.B}",
+                    $"BoxesFill={boxesFillPercent:F1}"
+                });
 
                 LoadThemeList();
 
@@ -493,10 +559,15 @@ namespace MooseTracks.Views
                 {
                     $"Background={backgroundColor.R},{backgroundColor.G},{backgroundColor.B}",
                     $"Foreground={foregroundColor.R},{foregroundColor.G},{foregroundColor.B}",
-                    $"BorderBrush={borderColor.R},{borderColor.G},{borderColor.B}"
+                    $"BorderBrush={borderColor.R},{borderColor.G},{borderColor.B}",
+                    // NEW:
+                    $"BoxesColor={boxesColor.R},{boxesColor.G},{boxesColor.B}",
+                    $"BoxesFill={boxesFillPercent:F1}"
                 });
 
                 ApplyTheme(backgroundColor, foregroundColor, borderColor);
+                ApplyBoxesTheme(boxesColor, boxesFillPercent); // NEW: push boxes to app resources
+
                 Log($"Applied theme: {themeName}");
                 MessageBox.Show("Theme applied successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 Log("Exiting ApplyThemeButton_Click");
@@ -537,16 +608,61 @@ namespace MooseTracks.Views
             try
             {
                 Log("Entering ApplyTheme");
-                Application.Current.Resources["AppBackground"] = new SolidColorBrush(background);
-                Application.Current.Resources["AppForeground"] = new SolidColorBrush(foreground);
-                Application.Current.Resources["AppBorderBrush"] = new SolidColorBrush(border);
+                ReplaceBrush("AppBackground", background);
+                ReplaceBrush("AppForeground", foreground);
+                ReplaceBrush("AppBorderBrush", border);
                 Log("Exiting ApplyTheme");
             }
             catch (Exception ex)
             {
-                Log($"Error in ApplyTheme: {ex.Message}");
-                MessageBox.Show($"Error applying theme: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Log($"Error in ApplyTheme: {ex}");
+                MessageBox.Show($"Error applying theme: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+
+        private void ReplaceResource(string key, object value)
+        {
+            // Ensure we're on the UI thread when touching Application.Current.Resources
+            if (Dispatcher.CheckAccess())
+                Application.Current.Resources[key] = value;
+            else
+                Dispatcher.Invoke(() => Application.Current.Resources[key] = value);
+        }
+
+        private void ReplaceBrush(string key, Color color, double? opacity = null)
+        {
+            var brush = new SolidColorBrush(color);
+            if (opacity.HasValue) brush.Opacity = Math.Max(0.0, Math.Min(1.0, opacity.Value));
+            // Freezing is safe (we always REPLACE, never mutate)
+            if (brush.CanFreeze) brush.Freeze();
+            ReplaceResource(key, brush);
+        }
+
+
+        // NEW: centralised function to apply boxes theme live
+        private void ApplyBoxesTheme(Color color, double fillPercent)
+        {
+            try
+            {
+                Log("Entering ApplyBoxesTheme");
+                var fill = Math.Max(0, Math.Min(100, fillPercent)) / 100.0;
+
+                ReplaceBrush("BoxesBorderBrush", color);
+                ReplaceBrush("BoxesBackgroundBrush", color, fill);
+                ReplaceResource("BoxesColor", color); // optional, but handy
+
+                Log($"Applied Boxes theme: {color.R},{color.G},{color.B}, Fill {fillPercent}%");
+                Log("Exiting ApplyBoxesTheme");
+            }
+            catch (Exception ex)
+            {
+                Log($"Error in ApplyBoxesTheme: {ex}");
+                MessageBox.Show($"Error applying boxes theme: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
     }
 }
