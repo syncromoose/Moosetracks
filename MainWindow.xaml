@@ -39,6 +39,7 @@
             <Button x:Name="ContainerButton" Content="Containers" Style="{StaticResource AppButtonStyle}" Width="120" Margin="0,0,10,0" Click="ContainerButton_Click"/>
             <Button x:Name="ExtractionButton" Content="Extraction" Style="{StaticResource AppButtonStyle}" Width="120" Margin="0,0,10,0" Click="ExtractionButton_Click"/>
             <Button x:Name="TranscodingButton" Content="Transcoding" Style="{StaticResource AppButtonStyle}" Width="120" Margin="0,0,10,0" Click="TranscodingButton_Click"/>
+            <Button x:Name="ThemeButton" Content="Theme" Style="{StaticResource AppButtonStyle}" Width="120" Margin="0,0,10,0" Click="ThemeButton_Click"/>
             <Button x:Name="SettingsButton" Content="Settings" Style="{StaticResource AppButtonStyle}" Width="120" Margin="0,0,10,0" Click="SettingsButton_Click"/>
             <Button x:Name="AboutButton" Content="About" Style="{StaticResource AppButtonStyle}" Width="120" Click="AboutButton_Click"/>
         </StackPanel>

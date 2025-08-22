@@ -71,7 +71,9 @@
                   Margin="0,8,0,0">
             <StackPanel>
                 <TextBlock Text="Progress:" Foreground="{DynamicResource AppForeground}" Margin="0,0,0,4"/>
-                <ProgressBar x:Name="FFmpegProgressBar" Height="16" Minimum="0" Maximum="100" Value="0"/>
+                <ProgressBar x:Name="FFmpegProgressBar"
+                             Height="16" Minimum="0" Maximum="100" Value="0"
+                             ToolTip="{StaticResource TT.Extraction.FFmpegProgressBar}"/>
 
                 <TextBlock Text="Output Log:" Foreground="{DynamicResource AppForeground}" Margin="0,6,0,4"/>
                 <TextBox x:Name="FFmpegOutputBox"
@@ -79,7 +81,8 @@
                          IsReadOnly="True"
                          VerticalScrollBarVisibility="Auto"
                          TextWrapping="Wrap"
-                         Style="{StaticResource ThemedTextBox}"/>
+                         Style="{StaticResource ThemedTextBox}"
+                         ToolTip="{StaticResource TT.Extraction.FFmpegOutputBox}"/>
             </StackPanel>
         </GroupBox>
 
@@ -90,7 +93,7 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- LEFT column: Grid (stretches) with the same 15px separator as Container -->
+            <!-- LEFT column -->
             <Grid Grid.Column="0" Margin="0,0,15,0" SnapsToDevicePixels="True">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -100,10 +103,9 @@
                     <RowDefinition Height="Auto"/>
                     <!-- Output Path -->
                     <RowDefinition Height="*"/>
-                    <!-- spacer -->
                 </Grid.RowDefinitions>
 
-                <!-- Input File (identical layout to Container) -->
+                <!-- Input File -->
                 <GroupBox Grid.Row="0" Header="Input File" Style="{StaticResource SectionGroupBox}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -117,7 +119,8 @@
                                  MinWidth="300"
                                  Margin="0,0,8,0"
                                  VerticalAlignment="Center"
-                                 Style="{StaticResource ThemedTextBox}"/>
+                                 Style="{StaticResource ThemedTextBox}"
+                                 ToolTip="{StaticResource TT.Extraction.InputFilePathBox}"/>
 
                         <Button x:Name="BrowseInputButton"
                                 Grid.Column="1"
@@ -125,37 +128,42 @@
                                 Width="90" Height="24"
                                 VerticalAlignment="Center"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
-                                Click="BrowseInputButton_Click"/>
+                                Click="BrowseInputButton_Click"
+                                ToolTip="{StaticResource TT.Extraction.BrowseInputButton}"/>
                     </Grid>
                 </GroupBox>
 
-                <!-- Extraction List (match Container 'Tracks' box height & styling) -->
+                <!-- Extraction List -->
                 <GroupBox Grid.Row="1" Header="Extraction List" Style="{StaticResource SectionGroupBox}">
                     <ListBox x:Name="ExtractionOutputBox"
-                             Height="260"  
-                        SelectionMode="Multiple"
+                             Height="260"
+                             SelectionMode="Multiple"
+                             AllowDrop="True"
                              SelectionChanged="ExtractionOutputBox_SelectionChanged"
-                             Style="{StaticResource ThemedListBox}"/>
+                             Style="{StaticResource ThemedListBox}"
+                             ToolTip="{StaticResource TT.Extraction.ExtractionOutputBox}"/>
                 </GroupBox>
 
-                <!-- Output Path (clone of Container's output layout) -->
+                <!-- Output Path -->
                 <GroupBox Grid.Row="2" Header="Output Path" Style="{StaticResource SectionGroupBox}">
                     <DockPanel>
                         <TextBox x:Name="OutputPathBox"
                                  Width="400"
                                  IsReadOnly="True"
-                                 Style="{StaticResource ThemedTextBox}"/>
+                                 Style="{StaticResource ThemedTextBox}"
+                                 ToolTip="{StaticResource TT.Extraction.OutputPathBox}"/>
                         <Button x:Name="BrowseOutputButton"
                                 Content="Browse"
                                 Width="80"
                                 Margin="8,0,0,0"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
-                                Click="BrowseOutputButton_Click"/>
+                                Click="BrowseOutputButton_Click"
+                                ToolTip="{StaticResource TT.Extraction.BrowseOutputButton}"/>
                     </DockPanel>
                 </GroupBox>
             </Grid>
 
-            <!-- RIGHT column: identical outer structure -->
+            <!-- RIGHT column -->
             <StackPanel Grid.Column="1" Orientation="Vertical" SnapsToDevicePixels="True">
                 <GroupBox Header="File Info" Style="{StaticResource SectionGroupBox}">
                     <Grid>
@@ -174,26 +182,47 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Filename:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="FileNameText" Grid.Row="0" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="FileNameText" Grid.Row="0" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Extraction.FileNameText}"/>
+
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Codec:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="CodecText" Grid.Row="1" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="CodecText" Grid.Row="1" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Extraction.CodecText}"/>
+
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Channels:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="ChannelsText" Grid.Row="2" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="ChannelsText" Grid.Row="2" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Extraction.ChannelsText}"/>
+
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Sample Rate:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="SampleRateText" Grid.Row="3" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="SampleRateText" Grid.Row="3" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Extraction.SampleRateText}"/>
+
                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Bitrate:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="BitrateText" Grid.Row="4" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="BitrateText" Grid.Row="4" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Extraction.BitrateText}"/>
+
                         <TextBlock Grid.Row="5" Grid.Column="0" Text="Duration:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="DurationText" Grid.Row="5" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="DurationText" Grid.Row="5" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Extraction.DurationText}"/>
+
                         <TextBlock Grid.Row="6" Grid.Column="0" Text="Size:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="SizeText" Grid.Row="6" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="SizeText" Grid.Row="6" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Extraction.SizeText}"/>
                     </Grid>
                 </GroupBox>
 
                 <Button x:Name="ExtractTracksButton" Content="Extract Tracks"
                         Width="200" Height="30" Margin="0,10,0,0"
                         HorizontalAlignment="Center"
-                        Click="ExtractTracksButton_Click"/>
+                        Click="ExtractTracksButton_Click"
+                        ToolTip="{StaticResource TT.Extraction.ExtractTracksButton}"/>
             </StackPanel>
         </Grid>
     </DockPanel>

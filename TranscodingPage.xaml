@@ -79,7 +79,8 @@
                              Height="16"
                              Minimum="0"
                              Maximum="100"
-                             Value="0"/>
+                             Value="0"
+                             ToolTip="{StaticResource TT.Transcoding.FFmpegProgressBar}"/>
 
                 <TextBlock Grid.Row="2"
                            Text="Output Log:"
@@ -95,7 +96,8 @@
                          TextWrapping="NoWrap"
                          HorizontalScrollBarVisibility="Auto"
                          VerticalScrollBarVisibility="Auto"
-                         Style="{StaticResource ThemedTextBox}"/>
+                         Style="{StaticResource ThemedTextBox}"
+                         ToolTip="{StaticResource TT.Transcoding.FFmpegOutputBox}"/>
             </Grid>
         </GroupBox>
 
@@ -126,14 +128,16 @@
                                  MinWidth="300"
                                  Margin="0,0,8,0"
                                  VerticalAlignment="Center"
-                                 Style="{StaticResource ThemedTextBox}"/>
+                                 Style="{StaticResource ThemedTextBox}"
+                                 ToolTip="{StaticResource TT.Transcoding.InputFilePathBox}"/>
                         <Button x:Name="BrowseInputButton"
                                 Grid.Column="1"
                                 Content="Browse…"
                                 Width="90" Height="24"
                                 VerticalAlignment="Center"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
-                                Click="BrowseInputButton_Click"/>
+                                Click="BrowseInputButton_Click"
+                                ToolTip="{StaticResource TT.Transcoding.BrowseInputButton}"/>
                     </Grid>
                 </GroupBox>
 
@@ -144,8 +148,10 @@
                         <ListBox x:Name="ExtractionOutputBox"
                                  Height="260"
                                  SelectionMode="Extended"
+                                 AllowDrop="True"
                                  SelectionChanged="ExtractionOutputBox_SelectionChanged"
-                                 Style="{StaticResource ThemedListBox}"/>
+                                 Style="{StaticResource ThemedListBox}"
+                                 ToolTip="{StaticResource TT.Transcoding.FileList}"/>
                     </Grid>
                 </GroupBox>
 
@@ -163,14 +169,16 @@
                                  MinWidth="300"
                                  Margin="0,0,8,0"
                                  VerticalAlignment="Center"
-                                 Style="{StaticResource ThemedTextBox}"/>
+                                 Style="{StaticResource ThemedTextBox}"
+                                 ToolTip="{StaticResource TT.Transcoding.OutputPathBox}"/>
                         <Button x:Name="BrowseOutputButton"
                                 Grid.Column="1"
                                 Content="Browse…"
                                 Width="90" Height="24"
                                 VerticalAlignment="Center"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
-                                Click="BrowseOutputButton_Click"/>
+                                Click="BrowseOutputButton_Click"
+                                ToolTip="{StaticResource TT.Transcoding.BrowseOutputButton}"/>
                     </Grid>
                 </GroupBox>
             </Grid>
@@ -193,25 +201,40 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Filename:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="FileNameText" Grid.Row="0" Grid.Column="1" Foreground="{DynamicResource AppForeground}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="FileNameText" Grid.Row="0" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{StaticResource TT.Transcoding.FileNameText}"/>
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Codec:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="CodecText" Grid.Row="1" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="CodecText" Grid.Row="1" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Transcoding.CodecText}"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Channels:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="ChannelsText" Grid.Row="2" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="ChannelsText" Grid.Row="2" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Transcoding.ChannelsText}"/>
 
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Sample Rate:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="SampleRateText" Grid.Row="3" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="SampleRateText" Grid.Row="3" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Transcoding.SampleRateText}"/>
 
                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Bitrate:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="BitrateText" Grid.Row="4" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="BitrateText" Grid.Row="4" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Transcoding.BitrateText}"/>
 
                         <TextBlock Grid.Row="5" Grid.Column="0" Text="Duration:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="DurationText" Grid.Row="5" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="DurationText" Grid.Row="5" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Transcoding.DurationText}"/>
 
                         <TextBlock Grid.Row="6" Grid.Column="0" Text="Size:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="SizeText" Grid.Row="6" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="SizeText" Grid.Row="6" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Transcoding.SizeText}"/>
                     </Grid>
                 </GroupBox>
 
@@ -219,7 +242,8 @@
                     <StackPanel>
                         <DockPanel Margin="0,0,0,6">
                             <TextBlock Text="Format:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                            <ComboBox x:Name="FormatComboBox" Width="120" Height="22" Foreground="Black">
+                            <ComboBox x:Name="FormatComboBox" Width="120" Height="22" Foreground="Black"
+                                      ToolTip="{StaticResource TT.Transcoding.FormatComboBox}">
                                 <ComboBox.ItemContainerStyle>
                                     <Style TargetType="ComboBoxItem">
                                         <Setter Property="Foreground" Value="Black"/>
@@ -242,7 +266,8 @@
 
                         <DockPanel Margin="0,0,0,6">
                             <TextBlock Text="Bitrate:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                            <ComboBox x:Name="BitrateComboBox" Width="120" Height="22" Foreground="Black">
+                            <ComboBox x:Name="BitrateComboBox" Width="120" Height="22" Foreground="Black"
+                                      ToolTip="{StaticResource TT.Transcoding.BitrateComboBox}">
                                 <ComboBox.ItemContainerStyle>
                                     <Style TargetType="ComboBoxItem">
                                         <Setter Property="Foreground" Value="Black"/>
@@ -255,10 +280,13 @@
 
                         <DockPanel Margin="0,0,0,6">
                             <TextBlock Text="Gain (dB):" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                            <TextBox x:Name="GainBox" Width="50" Style="{StaticResource ThemedTextBox}" Text="0"/>
+                            <TextBox x:Name="GainBox" Width="50" Style="{StaticResource ThemedTextBox}" Text="0"
+                                     ToolTip="{StaticResource TT.Transcoding.GainBox}"/>
                         </DockPanel>
 
-                        <CheckBox x:Name="DownmixCheckBox" Content="Downmix to Stereo" Foreground="{DynamicResource AppForeground}"/>
+                        <CheckBox x:Name="DownmixCheckBox" Content="Downmix to Stereo"
+                                  Foreground="{DynamicResource AppForeground}"
+                                  ToolTip="{StaticResource TT.Transcoding.DownmixCheckBox}"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -279,11 +307,13 @@
                                       Foreground="{DynamicResource AppForeground}"
                                       Checked="EnableFrameRateChangeCheckBox_Checked"
                                       Unchecked="EnableFrameRateChangeCheckBox_Unchecked"
-                                      Margin="0,0,0,5"/>
+                                      Margin="0,0,0,5"
+                                      ToolTip="{StaticResource TT.Transcoding.EnableFrameRateChangeCheckBox}"/>
                             <CheckBox x:Name="PreservePitchCheckbox"
                                       Content="Preserve Pitch"
                                       Foreground="{DynamicResource AppForeground}"
-                                      IsEnabled="False"/>
+                                      IsEnabled="False"
+                                      ToolTip="{StaticResource TT.Transcoding.PreservePitchCheckbox}"/>
                         </StackPanel>
 
                         <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
@@ -302,7 +332,8 @@
                                       x:Name="SourceFrameRateComboBox"
                                       Width="80"
                                       IsEnabled="False"
-                                      Foreground="Black">
+                                      Foreground="Black"
+                                      ToolTip="{StaticResource TT.Transcoding.SourceFrameRateComboBox}">
                                 <ComboBox.ItemContainerStyle>
                                     <Style TargetType="ComboBoxItem">
                                         <Setter Property="Foreground" Value="Black"/>
@@ -323,7 +354,8 @@
                                       x:Name="TargetFrameRateComboBox"
                                       Width="80"
                                       IsEnabled="False"
-                                      Foreground="Black">
+                                      Foreground="Black"
+                                      ToolTip="{StaticResource TT.Transcoding.TargetFrameRateComboBox}">
                                 <ComboBox.ItemContainerStyle>
                                     <Style TargetType="ComboBoxItem">
                                         <Setter Property="Foreground" Value="Black"/>
@@ -345,7 +377,8 @@
                         Content="Start Transcoding"
                         Width="220" Height="30" Margin="0,6,0,0"
                         HorizontalAlignment="Center"
-                        Click="TranscodeTracksButton_Click"/>
+                        Click="TranscodeTracksButton_Click"
+                        ToolTip="{StaticResource TT.Transcoding.TranscodeTracksButton}"/>
             </StackPanel>
         </Grid>
     </DockPanel>

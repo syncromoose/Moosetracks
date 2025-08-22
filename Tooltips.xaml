@@ -1,0 +1,118 @@
+﻿<!-- Tooltips.xaml (Build Action = Page, in project root) -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Keep ToolTip theming/timing in AppTheme.xaml; this file = strings only -->
+
+    <!-- CONTAINER -->
+    <sys:String x:Key="TT.Container.InputFilePathBox">Selected source media file. Read-only; set via “Browse…”.</sys:String>
+    <sys:String x:Key="TT.Container.BrowseInputButton">Pick a source container (video/audio) to scan for tracks.</sys:String>
+    <sys:String x:Key="TT.Container.ExtractionOutputBox">Tracks detected in the input. Tick which tracks to include when remuxing. Drag &amp; drop supported.</sys:String>
+    <sys:String x:Key="TT.Container.OutputPathBox">Destination folder for the remuxed file(s).</sys:String>
+    <sys:String x:Key="TT.Container.BrowseOutputButton">Choose the output folder.</sys:String>
+    <sys:String x:Key="TT.Container.FileNameText">Input filename.</sys:String>
+    <sys:String x:Key="TT.Container.CodecText">Primary codec reported by the container.</sys:String>
+    <sys:String x:Key="TT.Container.ChannelsText">Audio channel layout (e.g., 2.0, 5.1).</sys:String>
+    <sys:String x:Key="TT.Container.SampleRateText">Audio sample rate (Hz).</sys:String>
+    <sys:String x:Key="TT.Container.BitrateText">Overall/stream bitrate.</sys:String>
+    <sys:String x:Key="TT.Container.DurationText">Media duration.</sys:String>
+    <sys:String x:Key="TT.Container.SizeText">File size on disk.</sys:String>
+    <sys:String x:Key="TT.Container.ContainerText">Detected input container.</sys:String>
+    <sys:String x:Key="TT.Container.ContainerMp4Radio">Remux to MP4 container.</sys:String>
+    <sys:String x:Key="TT.Container.ContainerMkvRadio">Remux to MKV container (default).</sys:String>
+    <sys:String x:Key="TT.Container.ContainerMovRadio">Remux to QuickTime MOV container.</sys:String>
+    <sys:String x:Key="TT.Container.OptLanguageComboBox">Set a language tag for the selected tracks.</sys:String>
+    <sys:String x:Key="TT.Container.OptDelayTextBox">Delay selected tracks by milliseconds (positive delays audio/subs).</sys:String>
+    <sys:String x:Key="TT.Container.OptDefaultCheckBox">Mark selected track(s) as default.</sys:String>
+    <sys:String x:Key="TT.Container.OptForcedCheckBox">Mark selected subtitle track(s) as forced.</sys:String>
+    <sys:String x:Key="TT.Container.OptApplyButton">Apply these options to the currently selected tracks.</sys:String>
+    <sys:String x:Key="TT.Container.ExtractTracksButton">Start remuxing the selected tracks into the chosen container.</sys:String>
+    <sys:String x:Key="TT.Container.FFmpegProgressBar">FFmpeg progress for the current job.</sys:String>
+    <sys:String x:Key="TT.Container.FFmpegOutputBox">Live FFmpeg output and errors (read-only).</sys:String>
+
+    <!-- Extraction page tooltips -->
+    <sys:String x:Key="TT.Extraction.InputFilePathBox">Selected input media file. Drag a file here or use Browse.</sys:String>
+    <sys:String x:Key="TT.Extraction.BrowseInputButton">Choose a media file to analyze and extract from.</sys:String>
+    <sys:String x:Key="TT.Extraction.ExtractionOutputBox">List of items to extract. Use Ctrl/Shift to multi-select.</sys:String>
+    <sys:String x:Key="TT.Extraction.OutputPathBox">Destination folder for extracted files.</sys:String>
+    <sys:String x:Key="TT.Extraction.BrowseOutputButton">Pick where extracted files will be saved.</sys:String>
+    <sys:String x:Key="TT.Extraction.FFmpegProgressBar">Extraction progress. This fills as FFmpeg completes.</sys:String>
+    <sys:String x:Key="TT.Extraction.FFmpegOutputBox">Live FFmpeg log output. Helpful for troubleshooting.</sys:String>
+    <sys:String x:Key="TT.Extraction.FileNameText">Source file name being processed.</sys:String>
+    <sys:String x:Key="TT.Extraction.CodecText">Detected audio codec of the source.</sys:String>
+    <sys:String x:Key="TT.Extraction.ChannelsText">Number of audio channels detected.</sys:String>
+    <sys:String x:Key="TT.Extraction.SampleRateText">Sample rate (Hz) of the audio stream.</sys:String>
+    <sys:String x:Key="TT.Extraction.BitrateText">Estimated bitrate of the audio stream.</sys:String>
+    <sys:String x:Key="TT.Extraction.DurationText">Total duration of the source media.</sys:String>
+    <sys:String x:Key="TT.Extraction.SizeText">File size of the source media.</sys:String>
+    <sys:String x:Key="TT.Extraction.ExtractTracksButton">Start extracting the selected items.</sys:String>
+
+
+    <!-- Transcoding page tooltips -->
+    <sys:String x:Key="TT.Transcoding.FFmpegProgressBar">Transcoding progress. This fills as FFmpeg completes.</sys:String>
+    <sys:String x:Key="TT.Transcoding.FFmpegOutputBox">Live FFmpeg log output. Useful for monitoring and troubleshooting.</sys:String>
+    <sys:String x:Key="TT.Transcoding.InputFilePathBox">Selected input media file. Drag a file here or use Browse.</sys:String>
+    <sys:String x:Key="TT.Transcoding.BrowseInputButton">Choose a media file to transcode.</sys:String>
+    <sys:String x:Key="TT.Transcoding.FileList">Files queued for transcoding. Use Ctrl/Shift to multi-select.</sys:String>
+    <sys:String x:Key="TT.Transcoding.OutputPathBox">Destination folder for transcoded files.</sys:String>
+    <sys:String x:Key="TT.Transcoding.BrowseOutputButton">Pick where transcoded files will be saved.</sys:String>
+    <sys:String x:Key="TT.Transcoding.FileNameText">Source file name being processed.</sys:String>
+    <sys:String x:Key="TT.Transcoding.CodecText">Detected audio codec of the current file.</sys:String>
+    <sys:String x:Key="TT.Transcoding.ChannelsText">Number of audio channels detected.</sys:String>
+    <sys:String x:Key="TT.Transcoding.SampleRateText">Sample rate (Hz) of the audio stream.</sys:String>
+    <sys:String x:Key="TT.Transcoding.BitrateText">Estimated bitrate of the audio stream.</sys:String>
+    <sys:String x:Key="TT.Transcoding.DurationText">Total duration of the source media.</sys:String>
+    <sys:String x:Key="TT.Transcoding.SizeText">File size of the source media.</sys:String>
+    <sys:String x:Key="TT.Transcoding.FormatComboBox">Output audio format/container to encode to.</sys:String>
+    <sys:String x:Key="TT.Transcoding.BitrateComboBox">Target bitrate for lossy encoders (varies by format).</sys:String>
+    <sys:String x:Key="TT.Transcoding.GainBox">Apply gain in dB. Negative to reduce level.</sys:String>
+    <sys:String x:Key="TT.Transcoding.DownmixCheckBox">Mix multi-channel audio down to stereo.</sys:String>
+    <sys:String x:Key="TT.Transcoding.EnableFrameRateChangeCheckBox">Enable video frame rate conversion for the source.</sys:String>
+    <sys:String x:Key="TT.Transcoding.PreservePitchCheckbox">Keep audio pitch constant when changing speed.</sys:String>
+    <sys:String x:Key="TT.Transcoding.SourceFrameRateComboBox">Original frame rate of the source (used for conversion).</sys:String>
+    <sys:String x:Key="TT.Transcoding.TargetFrameRateComboBox">Desired frame rate for the output.</sys:String>
+    <sys:String x:Key="TT.Transcoding.TranscodeTracksButton">Start transcoding with the selected settings.</sys:String>
+
+
+    <!-- THEME page tooltips -->
+    <sys:String x:Key="TT.Theme.ThemeComboBox">Pick a saved theme to load its colors and settings.</sys:String>
+    <sys:String x:Key="TT.Theme.SaveDefaultThemeButton">Make the selected theme your startup default.</sys:String>
+    <sys:String x:Key="TT.Theme.BackgroundR">Background color — Red channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BackgroundG">Background color — Green channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BackgroundB">Background color — Blue channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BackgroundPreview">Preview of the current background color.</sys:String>
+    <sys:String x:Key="TT.Theme.ForegroundR">Text color — Red channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.ForegroundG">Text color — Green channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.ForegroundB">Text color — Blue channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.ForegroundPreview">Preview of the current text color.</sys:String>
+    <sys:String x:Key="TT.Theme.BorderR">Border color — Red channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BorderG">Border color — Green channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BorderB">Border color — Blue channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BorderPreview">Preview of the current border color.</sys:String>
+    <sys:String x:Key="TT.Theme.BoxesR">Panel/box color — Red channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BoxesG">Panel/box color — Green channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BoxesB">Panel/box color — Blue channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.BoxesFill">Box fill opacity percentage (0–100). Affects panel and tooltip shade.</sys:String>
+    <sys:String x:Key="TT.Theme.BoxesPreview">Preview of the current box/panel color.</sys:String>
+    <sys:String x:Key="TT.Theme.ProgressR">Progress bar color — Red channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.ProgressG">Progress bar color — Green channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.ProgressB">Progress bar color — Blue channel (0–255).</sys:String>
+    <sys:String x:Key="TT.Theme.ProgressPreview">Preview of the current progress bar color.</sys:String>
+    <sys:String x:Key="TT.Theme.BorderThicknessSlider">Thickness of visible borders (0–4 px).</sys:String>
+    <sys:String x:Key="TT.Theme.ThemeNameTextBox">Name for saving this set of colors as a theme file.</sys:String>
+    <sys:String x:Key="TT.Theme.SaveThemeButton">Save the current colors as a named theme.</sys:String>
+    <sys:String x:Key="TT.Theme.ApplyThemeButton">Apply and set the selected theme as active.</sys:String>
+
+    <!-- Settings page tooltips -->
+    <sys:String x:Key="TT.Settings.StartupPageCombo">Choose which page opens when MooseTracks starts. Click Save to write it to settings.cfg.</sys:String>
+    <sys:String x:Key="TT.Settings.SaveStartupButton">Save the selected startup page to Settings\settings.cfg (StartupPage=...).</sys:String>
+    <sys:String x:Key="TT.Settings.FFmpegPathTextBox">Path to ffmpeg.exe used by MooseTracks. Browse to select the executable. Must be a valid file.</sys:String>
+    <sys:String x:Key="TT.Settings.BrowseFFmpegButton">Browse for ffmpeg.exe on your system.</sys:String>
+    <sys:String x:Key="TT.Settings.SaveFFmpegButton">Save the FFmpeg path to Settings\settings.cfg (FFmpegPath=...).</sys:String>
+    <sys:String x:Key="TT.Settings.EnableTooltipsCheckbox">Turn in-app tooltips on or off globally. Click Save to apply and persist.</sys:String>
+    <sys:String x:Key="TT.Settings.SaveTooltipsButton">Save your tooltip preference to Settings\settings.cfg (Tooltips=On/Off) and apply it across the app.</sys:String>
+    
+
+</ResourceDictionary>

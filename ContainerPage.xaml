@@ -88,7 +88,8 @@
                              Height="16"
                              Minimum="0"
                              Maximum="100"
-                             Value="0"/>
+                             Value="0"
+                             ToolTip="{StaticResource TT.Container.FFmpegProgressBar}"/>
 
                 <TextBlock Grid.Row="2"
                            Text="Output Log:"
@@ -105,7 +106,8 @@
                          TextWrapping="NoWrap"
                          HorizontalScrollBarVisibility="Auto"
                          VerticalScrollBarVisibility="Auto"
-                         Style="{StaticResource ThemedTextBox}"/>
+                         Style="{StaticResource ThemedTextBox}"
+                         ToolTip="{StaticResource TT.Container.FFmpegOutputBox}"/>
             </Grid>
         </GroupBox>
 
@@ -142,14 +144,16 @@
                                  MinWidth="300"
                                  Margin="0,0,8,0"
                                  VerticalAlignment="Center"
-                                 Style="{StaticResource ThemedTextBox}"/>
+                                 Style="{StaticResource ThemedTextBox}"
+                                 ToolTip="{StaticResource TT.Container.InputFilePathBox}"/>
                         <Button x:Name="BrowseInputButton"
                                 Grid.Column="1"
                                 Content="Browse…"
                                 Width="90" Height="24"
                                 VerticalAlignment="Center"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
-                                Click="BrowseInputButton_Click"/>
+                                Click="BrowseInputButton_Click"
+                                ToolTip="{StaticResource TT.Container.BrowseInputButton}"/>
                     </Grid>
                 </GroupBox>
 
@@ -165,21 +169,20 @@
                                  PreviewDragOver="TracksList_PreviewDragOver"
                                  Drop="TracksList_Drop"
                                  SelectionChanged="ExtractionOutputBox_SelectionChanged"
-                                 Style="{StaticResource ThemedListBox}">
+                                 Style="{StaticResource ThemedListBox}"
+                                 ToolTip="{StaticResource TT.Container.ExtractionOutputBox}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel LastChildFill="True">
                                         <CheckBox Margin="0,0,8,0"
-                Focusable="False"
-                IsChecked="{Binding IsIncluded, Mode=TwoWay}"/>
+                                                  Focusable="False"
+                                                  IsChecked="{Binding IsIncluded, Mode=TwoWay}"/>
                                         <TextBlock Text="{Binding DisplayText}"
-                 Foreground="{DynamicResource AppForeground}"
-                 TextTrimming="CharacterEllipsis"/>
+                                                   Foreground="{DynamicResource AppForeground}"
+                                                   TextTrimming="CharacterEllipsis"/>
                                     </DockPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
-
-
                         </ListBox>
                     </Grid>
                 </GroupBox>
@@ -199,14 +202,16 @@
                                  MinWidth="300"
                                  Margin="0,0,8,0"
                                  VerticalAlignment="Center"
-                                 Style="{StaticResource ThemedTextBox}"/>
+                                 Style="{StaticResource ThemedTextBox}"
+                                 ToolTip="{StaticResource TT.Container.OutputPathBox}"/>
                         <Button x:Name="BrowseOutputButton"
                                 Grid.Column="1"
                                 Content="Browse…"
                                 Width="90" Height="24"
                                 VerticalAlignment="Center"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
-                                Click="BrowseOutputButton_Click"/>
+                                Click="BrowseOutputButton_Click"
+                                ToolTip="{StaticResource TT.Container.BrowseOutputButton}"/>
                     </Grid>
                 </GroupBox>
             </Grid>
@@ -233,28 +238,45 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Filename:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="FileNameText" Grid.Row="0" Grid.Column="1" Foreground="{DynamicResource AppForeground}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="FileNameText" Grid.Row="0" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{StaticResource TT.Container.FileNameText}"/>
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Codec:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="CodecText" Grid.Row="1" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="CodecText" Grid.Row="1" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Container.CodecText}"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Channels:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="ChannelsText" Grid.Row="2" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="ChannelsText" Grid.Row="2" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Container.ChannelsText}"/>
 
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Sample Rate:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="SampleRateText" Grid.Row="3" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="SampleRateText" Grid.Row="3" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Container.SampleRateText}"/>
 
                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Bitrate:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="BitrateText" Grid.Row="4" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="BitrateText" Grid.Row="4" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Container.BitrateText}"/>
 
                         <TextBlock Grid.Row="5" Grid.Column="0" Text="Duration:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="DurationText" Grid.Row="5" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="DurationText" Grid.Row="5" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Container.DurationText}"/>
 
                         <TextBlock Grid.Row="6" Grid.Column="0" Text="Size:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="SizeText" Grid.Row="6" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="SizeText" Grid.Row="6" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Container.SizeText}"/>
 
                         <TextBlock Grid.Row="7" Grid.Column="0" Text="Container:" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBlock x:Name="ContainerText" Grid.Row="7" Grid.Column="1" Foreground="{DynamicResource AppForeground}"/>
+                        <TextBlock x:Name="ContainerText" Grid.Row="7" Grid.Column="1"
+                                   Foreground="{DynamicResource AppForeground}"
+                                   ToolTip="{StaticResource TT.Container.ContainerText}"/>
                     </Grid>
                 </GroupBox>
 
@@ -267,17 +289,20 @@
                                          Content="MP4"
                                          GroupName="ContainerType"
                                          Margin="0,0,12,0"
-                                         Foreground="{DynamicResource AppForeground}"/>
+                                         Foreground="{DynamicResource AppForeground}"
+                                         ToolTip="{StaticResource TT.Container.ContainerMp4Radio}"/>
                             <RadioButton x:Name="ContainerMkvRadio"
                                          Content="MKV"
                                          GroupName="ContainerType"
                                          Margin="0,0,12,0"
                                          IsChecked="True"
-                                         Foreground="{DynamicResource AppForeground}"/>
+                                         Foreground="{DynamicResource AppForeground}"
+                                         ToolTip="{StaticResource TT.Container.ContainerMkvRadio}"/>
                             <RadioButton x:Name="ContainerMovRadio"
                                          Content="MOV"
                                          GroupName="ContainerType"
-                                         Foreground="{DynamicResource AppForeground}"/>
+                                         Foreground="{DynamicResource AppForeground}"
+                                         ToolTip="{StaticResource TT.Container.ContainerMovRadio}"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
@@ -287,7 +312,8 @@
                     <StackPanel>
                         <DockPanel Margin="0,0,0,6">
                             <TextBlock Text="Language:" Width="80" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                            <ComboBox x:Name="OptLanguageComboBox" Width="160" Height="22" Foreground="Black">
+                            <ComboBox x:Name="OptLanguageComboBox" Width="160" Height="22" Foreground="Black"
+                                      ToolTip="{StaticResource TT.Container.OptLanguageComboBox}">
                                 <ComboBoxItem Content="und (Unknown)"/>
                                 <ComboBoxItem Content="en (English)"/>
                                 <ComboBoxItem Content="fr (French)"/>
@@ -308,20 +334,25 @@
 
                         <DockPanel Margin="0,0,0,6">
                             <TextBlock Text="Delay (ms):" Width="80" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                            <TextBox x:Name="OptDelayTextBox" Width="80" Height="22" Style="{StaticResource ThemedTextBox}" Text="0"/>
+                            <TextBox x:Name="OptDelayTextBox" Width="80" Height="22"
+                                     Style="{StaticResource ThemedTextBox}" Text="0"
+                                     ToolTip="{StaticResource TT.Container.OptDelayTextBox}"/>
                             <TextBlock Text="  (positive = delay audio/subs)" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}" Opacity="0.75"/>
                         </DockPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <CheckBox x:Name="OptDefaultCheckBox" Content="Default" Margin="0,0,12,0" Foreground="{DynamicResource AppForeground}"/>
-                            <CheckBox x:Name="OptForcedCheckBox" Content="Forced" Foreground="{DynamicResource AppForeground}"/>
+                            <CheckBox x:Name="OptDefaultCheckBox" Content="Default" Margin="0,0,12,0" Foreground="{DynamicResource AppForeground}"
+                                      ToolTip="{StaticResource TT.Container.OptDefaultCheckBox}"/>
+                            <CheckBox x:Name="OptForcedCheckBox" Content="Forced" Foreground="{DynamicResource AppForeground}"
+                                      ToolTip="{StaticResource TT.Container.OptForcedCheckBox}"/>
                         </StackPanel>
 
                         <Button x:Name="OptApplyButton"
                                 Content="Apply to Selected"
                                 Width="160" Height="26"
                                 HorizontalAlignment="Left"
-                                Click="OptApplyButton_Click"/>
+                                Click="OptApplyButton_Click"
+                                ToolTip="{StaticResource TT.Container.OptApplyButton}"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -330,7 +361,8 @@
                         Content="Remux"
                         Width="220" Height="30" Margin="0,6,0,0"
                         HorizontalAlignment="Center"
-                        Click="ExtractTracksButton_Click"/>
+                        Click="ExtractTracksButton_Click"
+                        ToolTip="{StaticResource TT.Container.ExtractTracksButton}"/>
             </StackPanel>
         </Grid>
     </DockPanel>

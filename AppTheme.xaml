@@ -1,0 +1,130 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    
+   <!--Core theme brushes-->
+  
+    <SolidColorBrush x:Key="AppBackground"      Color="Transparent"/>
+    <SolidColorBrush x:Key="AppForeground"      Color="Transparent"/>
+    <SolidColorBrush x:Key="AppBorderBrush"     Color="Transparent"/>
+    <SolidColorBrush x:Key="ProgressBarForeground" Color="#FF3B82F6"/>
+    <SolidColorBrush x:Key="BoxesBorderBrush"   Color="Transparent"/>
+    <SolidColorBrush x:Key="BoxesBackgroundBrush" Color="Transparent" Opacity="0.0"/>
+    <Color           x:Key="BoxesColor">#00000000</Color>
+
+    <!-- Border thickness used by controls (layout) -->
+    <Thickness x:Key="AppBorderThickness">1</Thickness>
+    <!-- Visual overlay stroke thickness (non-layout) -->
+    <sys:Double x:Key="AppBorderStrokeThickness">1</sys:Double>
+
+    <!-- ============================================================
+         Global GroupBox style:
+         - real 1px inner border to keep layout steady
+         - header "chip"
+         - visual stroke overlay that doesn't affect layout
+         ============================================================ -->
+    <Style TargetType="GroupBox">
+        <Setter Property="Foreground"      Value="{DynamicResource AppForeground}"/>
+        <Setter Property="Background"      Value="{DynamicResource BoxesBackgroundBrush}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="{DynamicResource AppBorderThickness}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GroupBox">
+                    <Grid SnapsToDevicePixels="True">
+                        <!-- Stable inner border/background -->
+                        <Border CornerRadius="6"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                Padding="12"
+                                Margin="0,10,0,0" />
+
+                        <!-- Header chip -->
+                        <Border Background="{DynamicResource AppBackground}"
+                                TextElement.Foreground="{DynamicResource AppForeground}"
+                                Padding="4,0"
+                                HorizontalAlignment="Left"
+                                Margin="12,0,0,0">
+                            <ContentPresenter ContentSource="Header"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- Content body -->
+                        <ContentPresenter Margin="12,18,12,12"/>
+
+                        <!-- Visual stroke overlay (doesn't change layout) -->
+                        <Rectangle RadiusX="6" RadiusY="6"
+                                   IsHitTestVisible="False"
+                                   Stroke="{DynamicResource AppBorderBrush}"
+                                   StrokeThickness="{DynamicResource AppBorderStrokeThickness}"
+                                   Margin="0,10,0,0"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Apply tooltip timing to all hosts -->
+    <Style TargetType="{x:Type FrameworkElement}">
+        <Setter Property="ToolTipService.IsEnabled"       Value="{DynamicResource TooltipsEnabled}"/>
+        <Setter Property="ToolTipService.InitialShowDelay" Value="250"/>
+        <Setter Property="ToolTipService.BetweenShowDelay" Value="150"/>
+        <Setter Property="ToolTipService.ShowDuration"     Value="60000"/>
+    </Style>
+
+    <!-- Theme the tooltip popup itself -->
+    <!-- Opaque tooltip background: follows your accent color (BoxesColor) but forces full alpha -->
+    <SolidColorBrush x:Key="AppTooltipBackground"
+                 Color="{DynamicResource BoxesColor}"  Opacity="1"/>
+
+    <!-- Tooltip styling (make sure you only have ONE ToolTip style in the app) -->
+    <Style TargetType="{x:Type ToolTip}">
+        <Setter Property="Foreground"      Value="{DynamicResource AppForeground}"/>
+        <Setter Property="Background"      Value="{DynamicResource AppTooltipBackground}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="{DynamicResource AppBorderThickness}"/>
+        <Setter Property="Padding"         Value="6"/>
+        <Setter Property="MaxWidth"        Value="420"/>
+        <Setter Property="Placement"       Value="Mouse"/>
+    </Style>
+
+    <Style TargetType="{x:Type ProgressBar}">
+        <!-- Track (empty area) -->
+        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+        <!-- Fill colour: use the dedicated brush you already defined -->
+        <Setter Property="Foreground" Value="{DynamicResource ProgressBarForeground}"/>
+        <!-- Optional thin border (decoupled from AppBorderThickness) -->
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="{DynamicResource ProgressBarBorderThickness}"/>
+        <Setter Property="Height" Value="16"/>
+    </Style>
+
+    <!-- Implicit ComboBoxItem style with constants; NO RelativeSource bindings -->
+    <Style TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment"   Value="Center"/>
+    </Style>
+
+    <!-- Make every ComboBox use a binding-free ItemContainerStyle by default -->
+    <Style TargetType="{x:Type ComboBox}">
+        <!-- Keep your theme brushes if not overridden locally -->
+        <Setter Property="Foreground"      Value="{DynamicResource AppForeground}"/>
+        <Setter Property="Background"      Value="{DynamicResource BoxesBackgroundBrush}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource AppBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+
+        <!-- Container style with constants; no Ancestor bindings anywhere -->
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type ComboBoxItem}">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalContentAlignment"   Value="Center"/>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

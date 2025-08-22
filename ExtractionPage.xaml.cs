@@ -14,20 +14,33 @@ namespace MooseTracks.Views
 {
     public partial class ExtractionPage : UserControl
     {
-        // NEW: track output path behavior
+        // Track output path behavior
         private bool _outputManuallySet = false;
         private bool _settingOutputProgrammatically = false;
+
+        // Allowed media file extensions (used when dropping onto the list)
+        private static readonly string[] _allowedExts =
+        {
+            ".mkv",".mp4",".avi",".mov",".ts",".m2ts",
+            ".mp3",".flac",".aac",".wav",".ogg",".opus"
+        };
 
         public ExtractionPage()
         {
             InitializeComponent();
 
-            // Enable drag + drop for input
+            // Existing: Enable drag + drop for input TextBox
             InputFilePathBox.AllowDrop = true;
             InputFilePathBox.PreviewDragOver += InputFilePathBox_PreviewDragOver;
             InputFilePathBox.Drop += InputFilePathBox_Drop;
 
-            // NEW: mark when user sets output manually (so we don't override)
+            // NEW: Ensure the Extraction list also supports drag + drop
+            // (If you already wired this in XAML, this is harmless.)
+            ExtractionOutputBox.AllowDrop = true;
+            ExtractionOutputBox.PreviewDragOver += ExtractionOutputBox_PreviewDragOver;
+            ExtractionOutputBox.Drop += ExtractionOutputBox_Drop;
+
+            // Mark when user sets output manually (so we don't override)
             OutputPathBox.TextChanged += (s, e) =>
             {
                 if (_settingOutputProgrammatically) return;
@@ -35,7 +48,21 @@ namespace MooseTracks.Views
             };
         }
 
-        // NEW: helper to set default output to the input file's folder (unless user chose one)
+        // Small helper so Browse/Drop use the same flow
+        private void OpenInputFromPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return;
+
+            InputFilePathBox.Text = path;
+
+            // Default output to input folder unless user already chose one
+            SetDefaultOutputFromInput(path);
+
+            // Populate file info + streams
+            LoadFileInfo(path);
+        }
+
+        // Set default output to the input file's folder (unless user chose one)
         private void SetDefaultOutputFromInput(string inputPath)
         {
             if (_outputManuallySet) return;
@@ -58,12 +85,7 @@ namespace MooseTracks.Views
 
             if (dlg.ShowDialog() == true)
             {
-                InputFilePathBox.Text = dlg.FileName;
-
-                // NEW: default output to input folder if user hasn't chosen otherwise
-                SetDefaultOutputFromInput(dlg.FileName);
-
-                LoadFileInfo(dlg.FileName);
+                OpenInputFromPath(dlg.FileName);
             }
         }
 
@@ -71,7 +93,7 @@ namespace MooseTracks.Views
         {
             var dlg = new System.Windows.Forms.FolderBrowserDialog();
 
-            // NEW: start in current output (if valid) else the input's folder, else Documents
+            // Start in current output (if valid) else the input's folder, else Documents
             var inputDir = Path.GetDirectoryName(InputFilePathBox.Text);
             dlg.SelectedPath = Directory.Exists(OutputPathBox.Text)
                 ? OutputPathBox.Text
@@ -90,7 +112,7 @@ namespace MooseTracks.Views
         }
         #endregion
 
-        #region Drag and Drop
+        #region Drag and Drop (Input TextBox)
         private void InputFilePathBox_PreviewDragOver(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.Copy;
@@ -104,14 +126,39 @@ namespace MooseTracks.Views
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (files.Length > 0)
                 {
-                    InputFilePathBox.Text = files[0];
-
-                    // NEW: default output to input folder if user hasn't chosen otherwise
-                    SetDefaultOutputFromInput(files[0]);
-
-                    LoadFileInfo(files[0]);
+                    OpenInputFromPath(files[0]);
                 }
             }
+        }
+        #endregion
+
+        #region Drag and Drop (Extraction List)
+        private void ExtractionOutputBox_PreviewDragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+                e.Handled = true;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+                e.Handled = true;
+            }
+        }
+
+        private void ExtractionOutputBox_Drop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
+
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files == null || files.Length == 0) return;
+
+            // Prefer the first file with a known media extension (fallback to first file)
+            var firstValid = files.FirstOrDefault(f => _allowedExts.Contains(Path.GetExtension(f).ToLowerInvariant()))
+                             ?? files[0];
+
+            OpenInputFromPath(firstValid);
         }
         #endregion
 
@@ -120,7 +167,7 @@ namespace MooseTracks.Views
         {
             try
             {
-                // NEW: ensure default output path is set (unless user picked a custom one)
+                // Ensure default output path is set (unless user picked a custom one)
                 SetDefaultOutputFromInput(filePath);
 
                 var (doc, rawJson) = await RunFfprobeAsync(filePath);
@@ -263,7 +310,7 @@ namespace MooseTracks.Views
                 return;
             }
 
-            // NEW: safety net — default output to input folder if empty
+            // Safety net — default output to input folder if empty
             if (string.IsNullOrWhiteSpace(outputDir))
             {
                 outputDir = Path.GetDirectoryName(input) ?? Environment.CurrentDirectory;
@@ -391,6 +438,7 @@ namespace MooseTracks.Views
 
         private void ExtractionOutputBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // (intentionally left empty)
         }
 
         #region Helpers

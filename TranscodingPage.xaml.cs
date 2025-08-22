@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -8,7 +9,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Collections.Generic;
 
 namespace MooseTracks.Views
 {
@@ -16,9 +16,16 @@ namespace MooseTracks.Views
     {
         private readonly FFmpegRunner _ffmpegRunner;
 
-        // NEW: track output path behavior
+        // Track output path behavior
         private bool _outputManuallySet = false;
         private bool _settingOutputProgrammatically = false;
+
+        // Allowed media file extensions (for ListBox drop)
+        private static readonly string[] _allowedExts =
+        {
+            ".mkv",".mp4",".avi",".mov",".ts",".m2ts",
+            ".mp3",".flac",".aac",".wav",".w64",".ogg",".opus"
+        };
 
         public TranscodingPage()
         {
@@ -33,12 +40,17 @@ namespace MooseTracks.Views
             EnsureFpsOptions();
             EnsureBitrateOptions();
 
-            // Drag & Drop for input file path box
+            // Drag & Drop for input file TextBox
             InputFilePathBox.AllowDrop = true;
             InputFilePathBox.PreviewDragOver += (s, e) => { e.Effects = DragDropEffects.Copy; e.Handled = true; };
             InputFilePathBox.Drop += InputFilePathBox_Drop;
 
-            // NEW: detect manual edits to output path so we don't override them
+            // NEW: Drag & Drop for the "File List" ListBox (ExtractionOutputBox)
+            ExtractionOutputBox.AllowDrop = true;
+            ExtractionOutputBox.PreviewDragOver += ExtractionOutputBox_PreviewDragOver;
+            ExtractionOutputBox.Drop += ExtractionOutputBox_Drop;
+
+            // Detect manual edits to output path so we don't override them
             OutputPathBox.TextChanged += (s, e) =>
             {
                 if (_settingOutputProgrammatically) return;
@@ -49,15 +61,45 @@ namespace MooseTracks.Views
             SetFpsControlsEnabled(false);
         }
 
+        // =============== Shared open helper ===============
+
+        private void OpenInputFromPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return;
+
+            InputFilePathBox.Text = path;
+
+            // Default output to input folder unless user already chose one
+            SetDefaultOutputFromInput(path);
+
+            // Populate file info + streams
+            LoadFileInfoAndStreams(path);
+        }
+
+        // Default output to the input file's folder (unless user chose one)
+        private void SetDefaultOutputFromInput(string inputPath)
+        {
+            if (_outputManuallySet) return;
+
+            var dir = Path.GetDirectoryName(inputPath);
+            if (string.IsNullOrWhiteSpace(dir)) return;
+
+            _settingOutputProgrammatically = true;
+            OutputPathBox.Text = dir;
+            _settingOutputProgrammatically = false;
+        }
+
+        // =============== FFmpeg/ffprobe path ===============
+
         private string ResolveFFmpegPath()
         {
             // Try system PATH first
-            string ffmpegPath = "ffmpeg";
+            const string ffmpegCmd = "ffmpeg";
             try
             {
                 var psi = new ProcessStartInfo
                 {
-                    FileName = ffmpegPath,
+                    FileName = ffmpegCmd,
                     Arguments = "-version",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
@@ -67,7 +109,7 @@ namespace MooseTracks.Views
                 {
                     proc.WaitForExit();
                     if (proc.ExitCode == 0)
-                        return ffmpegPath;
+                        return ffmpegCmd;
                 }
             }
             catch
@@ -83,22 +125,26 @@ namespace MooseTracks.Views
             throw new FileNotFoundException("FFmpeg executable not found in PATH or local folder.");
         }
 
-        // NEW: helper to default output to the input file's folder (unless user chose one)
-        private void SetDefaultOutputFromInput(string inputPath)
+        private string ResolveFFprobePath()
         {
-            if (_outputManuallySet) return;
+            var ffmpegPath = ResolveFFmpegPath();
+            try
+            {
+                // If it's a full path to ffmpeg.exe, swap the file name to ffprobe.exe
+                if (ffmpegPath.EndsWith("ffmpeg.exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    var dir = Path.GetDirectoryName(ffmpegPath) ?? "";
+                    var candidate = Path.Combine(dir, "ffprobe.exe");
+                    if (File.Exists(candidate)) return candidate;
+                }
+            }
+            catch { /* ignore */ }
 
-            var dir = Path.GetDirectoryName(inputPath);
-            if (string.IsNullOrWhiteSpace(dir)) return;
-
-            _settingOutputProgrammatically = true;
-            OutputPathBox.Text = dir;
-            _settingOutputProgrammatically = false;
+            // Otherwise use the command "ffprobe" (PATH case)
+            return "ffprobe";
         }
 
-        // =========================
-        // Browse / Drag & Drop
-        // =========================
+        // =============== Browse / Drag & Drop ===============
 
         private void BrowseInputButton_Click(object sender, RoutedEventArgs e)
         {
@@ -108,12 +154,7 @@ namespace MooseTracks.Views
             };
             if (dlg.ShowDialog() == true)
             {
-                InputFilePathBox.Text = dlg.FileName;
-
-                // NEW: default output to input folder if user hasn't chosen otherwise
-                SetDefaultOutputFromInput(dlg.FileName);
-
-                LoadFileInfoAndStreams(dlg.FileName);
+                OpenInputFromPath(dlg.FileName);
             }
         }
 
@@ -123,20 +164,44 @@ namespace MooseTracks.Views
             var files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files?.Length > 0)
             {
-                InputFilePathBox.Text = files[0];
-
-                // NEW: default output to input folder if user hasn't chosen otherwise
-                SetDefaultOutputFromInput(files[0]);
-
-                LoadFileInfoAndStreams(files[0]);
+                OpenInputFromPath(files[0]);
             }
+        }
+
+        // NEW: ListBox (“File List”) DnD behaves like open
+        private void ExtractionOutputBox_PreviewDragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+                e.Handled = true;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+                e.Handled = true;
+            }
+        }
+
+        private void ExtractionOutputBox_Drop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
+
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files == null || files.Length == 0) return;
+
+            // Prefer the first file with a known media extension (fallback to first file)
+            var firstValid = files.FirstOrDefault(f => _allowedExts.Contains(Path.GetExtension(f).ToLowerInvariant()))
+                             ?? files[0];
+
+            OpenInputFromPath(firstValid);
         }
 
         private void BrowseOutputButton_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new System.Windows.Forms.FolderBrowserDialog();
 
-            // NEW: start in current output (if valid) else the input's folder, else Documents
+            // Start in current output (if valid) else the input's folder, else Documents
             var inputDir = Path.GetDirectoryName(InputFilePathBox.Text);
             dlg.SelectedPath = Directory.Exists(OutputPathBox.Text)
                 ? OutputPathBox.Text
@@ -154,9 +219,7 @@ namespace MooseTracks.Views
             }
         }
 
-        // =========================
-        // FPS Controls
-        // =========================
+        // =============== FPS Controls ===============
 
         private void EnableFrameRateChangeCheckBox_Checked(object sender, RoutedEventArgs e) => SetFpsControlsEnabled(true);
         private void EnableFrameRateChangeCheckBox_Unchecked(object sender, RoutedEventArgs e) => SetFpsControlsEnabled(false);
@@ -170,7 +233,7 @@ namespace MooseTracks.Views
 
         private void EnsureFpsOptions()
         {
-            var wanted = new[] { "23.976", "24", "25", "29.976", "30" };
+            var wanted = new[] { "23.976", "24", "25", "29.97", "30" };
             void ResetCombo(ComboBox cb)
             {
                 cb.Items.Clear();
@@ -232,21 +295,18 @@ namespace MooseTracks.Views
                 case "wav64":
                 case "flac":
                 case "ogg":
-                    return new string[0];
                 default:
-                    return new string[0];
+                    return Array.Empty<string>();
             }
         }
 
-        // =========================
-        // File Info + Audio Streams
-        // =========================
+        // =============== File Info + Audio Streams ===============
 
         private async void LoadFileInfoAndStreams(string filePath)
         {
             try
             {
-                // NEW: ensure default output path is set (unless user picked a custom one)
+                // Ensure default output path is set (unless user picked a custom one)
                 SetDefaultOutputFromInput(filePath);
 
                 var (doc, _) = await RunFfprobeAsync(filePath);
@@ -317,37 +377,9 @@ namespace MooseTracks.Views
             }
         }
 
-        private static string ParseInBrackets(string s, string suffix)
-        {
-            var start = s.IndexOf('(');
-            var end = s.IndexOf(')');
-            if (start >= 0 && end > start)
-            {
-                var content = s.Substring(start + 1, end - start - 1);
-                if (content.Trim().EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
-                {
-                    return content.Replace(suffix, "", StringComparison.OrdinalIgnoreCase).Trim();
-                }
-            }
-            return null;
-        }
-
-        private static string ParseSampleRate(string s)
-        {
-            var hzPos = s.IndexOf("Hz", StringComparison.OrdinalIgnoreCase);
-            if (hzPos > 0)
-            {
-                var part = s.Substring(0, hzPos).Trim();
-                var lastSpace = part.LastIndexOf(' ');
-                if (lastSpace >= 0)
-                    return part.Substring(lastSpace + 1) + " Hz";
-            }
-            return null;
-        }
-
         private async Task<(JsonDocument doc, string raw)> RunFfprobeAsync(string filePath)
         {
-            var ffprobePath = ResolveFFmpegPath().Replace("ffmpeg", "ffprobe"); // Use same path logic for ffprobe
+            var ffprobePath = ResolveFFprobePath();
             var psi = new ProcessStartInfo
             {
                 FileName = ffprobePath,
@@ -384,9 +416,7 @@ namespace MooseTracks.Views
             return TimeSpan.Zero;
         }
 
-        // =========================
-        // Transcoding (audio only)
-        // =========================
+        // =============== Transcoding (audio only) ===============
 
         private async void TranscodeTracksButton_Click(object sender, RoutedEventArgs e)
         {
@@ -399,7 +429,7 @@ namespace MooseTracks.Views
                 return;
             }
 
-            // NEW: safety net — default output to input folder if empty
+            // Safety net — default output to input folder if empty
             if (string.IsNullOrWhiteSpace(outputDir))
             {
                 outputDir = Path.GetDirectoryName(input) ?? Environment.CurrentDirectory;
@@ -641,6 +671,34 @@ namespace MooseTracks.Views
             public string Codec { get; set; }
             public string Description { get; set; }
             public override string ToString() => Description;
+        }
+
+        private static string ParseInBrackets(string s, string suffix)
+        {
+            var start = s.IndexOf('(');
+            var end = s.IndexOf(')');
+            if (start >= 0 && end > start)
+            {
+                var content = s.Substring(start + 1, end - start - 1);
+                if (content.Trim().EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return content.Replace(suffix, "", StringComparison.OrdinalIgnoreCase).Trim();
+                }
+            }
+            return null;
+        }
+
+        private static string ParseSampleRate(string s)
+        {
+            var hzPos = s.IndexOf("Hz", StringComparison.OrdinalIgnoreCase);
+            if (hzPos > 0)
+            {
+                var part = s.Substring(0, hzPos).Trim();
+                var lastSpace = part.LastIndexOf(' ');
+                if (lastSpace >= 0)
+                    return part.Substring(lastSpace + 1) + " Hz";
+            }
+            return null;
         }
     }
 }

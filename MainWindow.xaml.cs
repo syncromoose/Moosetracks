@@ -101,6 +101,7 @@ namespace MooseTracks
                 if (ContainerButton != null) ContainerButton.Style = (Style)FindResource("AppButtonStyle");
                 if (ExtractionButton != null) ExtractionButton.Style = (Style)FindResource("AppButtonStyle");
                 if (TranscodingButton != null) TranscodingButton.Style = (Style)FindResource("AppButtonStyle");
+                if (ThemeButton != null) ThemeButton.Style = (Style)FindResource("AppButtonStyle");
                 if (SettingsButton != null) SettingsButton.Style = (Style)FindResource("AppButtonStyle");
                 if (AboutButton != null) AboutButton.Style = (Style)FindResource("AppButtonStyle");
             }
@@ -142,6 +143,12 @@ namespace MooseTracks
             HighlightButton(TranscodingButton);
         }
 
+        private void ThemeButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowThemePage();
+            HighlightButton(ThemeButton);
+        }
+
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             ShowSettingsPage();
@@ -151,7 +158,7 @@ namespace MooseTracks
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                "MooseTracks v0.93\n\nDeveloped by Syncromoose\n\nAll rights reserved.\n\n" +
+                "MooseTracks v0.94\n\nDeveloped by Syncromoose\n\nAll rights reserved.\n\n" +
                 "Special Thanks to\nOberje of The Fingerbobs,\nFilm X Desire,\nGetToTheChopper",
                 "About MooseTracks",
                 MessageBoxButton.OK,
@@ -178,6 +185,12 @@ namespace MooseTracks
         {
             if (MainContentControl != null)
                 MainContentControl.Content = new Views.TranscodingPage();
+        }
+
+        private void ShowThemePage()
+        {
+            if (MainContentControl != null)
+                MainContentControl.Content = new Views.Theme();
         }
 
         private void ShowSettingsPage()

@@ -1,59 +1,17 @@
 ﻿<UserControl x:Class="MooseTracks.Views.SettingsPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:MooseTracks"
              Background="{DynamicResource AppBackground}"
              UseLayoutRounding="True"
              SnapsToDevicePixels="True">
 
     <UserControl.Resources>
-        <local:ColorConverter x:Key="ColorConverter"/>
-
-        <Style TargetType="TextBox">
-            <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
-            <Setter Property="CaretBrush" Value="{DynamicResource AppForeground}"/>
-            <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-        </Style>
-
-        <Style TargetType="ComboBox">
-            <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
-            <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-            <Setter Property="ItemContainerStyle">
-                <Setter.Value>
-                    <Style TargetType="ComboBoxItem">
-                        <Setter Property="HorizontalContentAlignment"
-                                Value="{Binding HorizontalContentAlignment,
-                                                RelativeSource={RelativeSource AncestorType=ComboBox},
-                                                FallbackValue=Stretch, TargetNullValue=Stretch}"/>
-                        <Setter Property="VerticalContentAlignment"
-                                Value="{Binding VerticalContentAlignment,
-                                                RelativeSource={RelativeSource AncestorType=ComboBox},
-                                                FallbackValue=Center, TargetNullValue=Center}"/>
-                    </Style>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="ListBox">
-            <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
-            <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-        </Style>
-
-        <Style TargetType="Button">
-            <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
-            <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-        </Style>
-
         <Style x:Key="SectionGroupBox" TargetType="GroupBox">
             <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
             <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
             <Setter Property="Padding" Value="1"/>
-            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Margin" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="GroupBox">
@@ -85,292 +43,106 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <Style x:Key="RgbValueBox" TargetType="TextBox">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="Black"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-            <Setter Property="Width" Value="46"/>
-            <Setter Property="Height" Value="22"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        </Style>
     </UserControl.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <GroupBox Header="Configuration"
-                  Style="{StaticResource SectionGroupBox}"
-                  Grid.Row="0">
-            <Grid HorizontalAlignment="Left" MaxWidth="760">
+    <GroupBox Header="Configuration" Style="{StaticResource SectionGroupBox}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+            <Grid x:Name="LayoutGrid" Margin="0" Grid.IsSharedSizeScope="True">
+                <!-- Columns: Label | Half-width content | Spacer | Buttons -->
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
+
+                <!-- Rows with invisible spacers -->
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <!-- 0: Default Window -->
                     <RowDefinition Height="Auto"/>
+                    <!-- 1: Spacer -->
                     <RowDefinition Height="Auto"/>
+                    <!-- 2: FFmpeg Path row -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- 3: Spacer -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- 4: Tooltips row -->
                 </Grid.RowDefinitions>
 
+                <!-- Default Window -->
                 <TextBlock Grid.Row="0" Grid.Column="0"
                            Text="Default Window:" VerticalAlignment="Center"
+                           Margin="0,0,10,0"
                            Foreground="{DynamicResource AppForeground}"/>
                 <ComboBox x:Name="StartupPageCombo"
                           Grid.Row="0" Grid.Column="1"
                           Width="220" Height="22"
+                          HorizontalAlignment="Left"
                           Foreground="Black"
-                          Background="{DynamicResource BoxesBackgroundBrush}"/>
-                <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal"
-                            HorizontalAlignment="Right">
-                    <Button x:Name="SaveStartupButton" Content="Save"
-                            Width="100" Padding="10,0"
-                            Click="SaveStartupButton_Click"/>
-                </StackPanel>
+                          Background="{DynamicResource BoxesBackgroundBrush}"
+                          DisplayMemberPath="Label"
+                          SelectedValuePath="Key"
+                          ToolTip="{StaticResource TT.Settings.StartupPageCombo}"/>
+                <Button Grid.Row="0" Grid.Column="3"
+                        x:Name="SaveStartupButton" Content="Save"
+                        Width="80" Padding="6,0"
+                        Click="SaveStartupButton_Click"
+                        ToolTip="{StaticResource TT.Settings.SaveStartupButton}"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="0"
+                <!-- Invisible spacer -->
+                <Separator Grid.Row="1" Grid.ColumnSpan="4" Opacity="0" Height="12"/>
+
+                <!-- FFmpeg Path (Browse inline) + Save FFmpeg Path on same row (right column) -->
+                <TextBlock Grid.Row="2" Grid.Column="0"
                            Text="FFmpeg Path:" VerticalAlignment="Center"
+                           Margin="0,0,10,0"
                            Foreground="{DynamicResource AppForeground}"/>
-                <TextBox x:Name="FFmpegPathTextBox"
-                         Grid.Row="1" Grid.Column="1"
-                         Height="22" MinWidth="400"/>
-                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal"
-                            HorizontalAlignment="Right">
-                    <Button x:Name="BrowseFFmpegButton" Content="Browse"
-                            Width="100" Padding="10,0"
-                            Click="BrowseFFmpegButton_Click"/>
-                </StackPanel>
+                <Grid Grid.Row="2" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="FFmpegPathTextBox"
+                             Grid.Column="0"
+                             Height="22" MinWidth="240"
+                             HorizontalAlignment="Stretch"
+                             ToolTip="{StaticResource TT.Settings.FFmpegPathTextBox}"/>
+                    <Button x:Name="BrowseFFmpegButton"
+                            Grid.Column="1"
+                            Content="Browse"
+                            Width="80" Padding="6,0"
+                            Margin="8,0,0,0"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            Click="BrowseFFmpegButton_Click"
+                            ToolTip="{StaticResource TT.Settings.BrowseFFmpegButton}"/>
+                </Grid>
+                <Button Grid.Row="2" Grid.Column="3"
+                        x:Name="SaveFFmpegButton" Content="Save FFmpeg Path"
+                        Width="120" Padding="6,0"
+                        Click="SaveFFmpegButton_Click"
+                        ToolTip="{StaticResource TT.Settings.SaveFFmpegButton}"/>
 
-                <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal"
-                            HorizontalAlignment="Right" Margin="0,6,0,0">
-                    <Button x:Name="SaveFFmpegButton" Content="Save FFmpeg Path"
-                            Width="140" Padding="10,0"
-                            Click="SaveFFmpegButton_Click"/>
-                </StackPanel>
+                <!-- Invisible spacer -->
+                <Separator Grid.Row="3" Grid.ColumnSpan="4" Opacity="0" Height="12"/>
+
+                <!-- Tooltips toggle -->
+                <TextBlock Grid.Row="4" Grid.Column="0"
+                           Text="Tooltips:" VerticalAlignment="Center"
+                           Margin="0,0,10,0"
+                           Foreground="{DynamicResource AppForeground}"/>
+                <CheckBox x:Name="EnableTooltipsCheckbox"
+                          Grid.Row="4" Grid.Column="1"
+                          Content="Enable tooltips"
+                          VerticalAlignment="Center"
+                          IsChecked="True"
+                          ToolTip="{StaticResource TT.Settings.EnableTooltipsCheckbox}"/>
+                <Button Grid.Row="4" Grid.Column="3"
+                        x:Name="SaveTooltipsButton" Content="Save"
+                        Width="80" Padding="6,0"
+                        Click="SaveTooltipsButton_Click"
+                        ToolTip="{StaticResource TT.Settings.SaveTooltipsButton}"/>
             </Grid>
-        </GroupBox>
-
-        <GroupBox Header="Theme Configuration"
-                  Style="{StaticResource SectionGroupBox}"
-                  Grid.Row="1" Margin="0,10,0,0">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True">
-                <StackPanel>
-                    <DockPanel Margin="0,0,0,10">
-                        <TextBlock Text="Theme:" Width="120" VerticalAlignment="Center"
-                                   Foreground="{DynamicResource AppForeground}"/>
-                        <ComboBox x:Name="ThemeComboBox" Width="220"
-                                  Foreground="Black"
-                                  Background="{DynamicResource BoxesBackgroundBrush}"
-                                  SelectionChanged="ThemeComboBox_SelectionChanged"/>
-                        <Button x:Name="SaveDefaultThemeButton" Content="Set as Default"
-                                Width="120" Margin="8,0,0,0"
-                                Click="SaveDefaultThemeButton_Click"/>
-                    </DockPanel>
-
-                    <DockPanel Margin="0,0,0,10">
-                        <TextBlock Text="Background:" Width="120" VerticalAlignment="Top"
-                                   Foreground="{DynamicResource AppForeground}"/>
-                        <StackPanel Width="300">
-                            <DockPanel Margin="0,0,0,2">
-                                <TextBlock Text="R:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BackgroundRSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BackgroundRSlider" Minimum="0" Maximum="255" Value="0"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <DockPanel Margin="0,0,0,2">
-                                <TextBlock Text="G:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BackgroundGSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BackgroundGSlider" Minimum="0" Maximum="255" Value="0"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock Text="B:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BackgroundBSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BackgroundBSlider" Minimum="0" Maximum="255" Value="0"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <Rectangle x:Name="BackgroundPreview" Height="20" Margin="0,6,0,0"
-                                       Stroke="{DynamicResource AppBorderBrush}" StrokeThickness="1">
-                                <Rectangle.Fill>
-                                    <MultiBinding Converter="{StaticResource ColorConverter}">
-                                        <Binding ElementName="BackgroundRSlider" Path="Value"/>
-                                        <Binding ElementName="BackgroundGSlider" Path="Value"/>
-                                        <Binding ElementName="BackgroundBSlider" Path="Value"/>
-                                    </MultiBinding>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </StackPanel>
-                    </DockPanel>
-
-                    <DockPanel Margin="0,0,0,10">
-                        <TextBlock Text="Text Colour:" Width="120" VerticalAlignment="Top"
-                                   Foreground="{DynamicResource AppForeground}"/>
-                        <StackPanel Width="300">
-                            <DockPanel Margin="0,0,0,2">
-                                <TextBlock Text="R:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=ForegroundRSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="ForegroundRSlider" Minimum="0" Maximum="255" Value="255"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <DockPanel Margin="0,0,0,2">
-                                <TextBlock Text="G:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=ForegroundGSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="ForegroundGSlider" Minimum="0" Maximum="255" Value="255"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock Text="B:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=ForegroundBSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="ForegroundBSlider" Minimum="0" Maximum="255" Value="255"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <Rectangle x:Name="ForegroundPreview" Height="20" Margin="0,6,0,0"
-                                       Stroke="{DynamicResource AppBorderBrush}" StrokeThickness="1">
-                                <Rectangle.Fill>
-                                    <MultiBinding Converter="{StaticResource ColorConverter}">
-                                        <Binding ElementName="ForegroundRSlider" Path="Value"/>
-                                        <Binding ElementName="ForegroundGSlider" Path="Value"/>
-                                        <Binding ElementName="ForegroundBSlider" Path="Value"/>
-                                    </MultiBinding>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </StackPanel>
-                    </DockPanel>
-
-                    <DockPanel Margin="0,0,0,10">
-                        <TextBlock Text="Border:" Width="120" VerticalAlignment="Top"
-                                   Foreground="{DynamicResource AppForeground}"/>
-                        <StackPanel Width="300">
-                            <DockPanel Margin="0,0,0,2">
-                                <TextBlock Text="R:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BorderRSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BorderRSlider" Minimum="0" Maximum="255" Value="255"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <DockPanel Margin="0,0,0,2">
-                                <TextBlock Text="G:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BorderGSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BorderGSlider" Minimum="0" Maximum="255" Value="165"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock Text="B:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BorderBSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BorderBSlider" Minimum="0" Maximum="255" Value="0"
-                                        ValueChanged="ColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <Rectangle x:Name="BorderPreview" Height="20" Margin="0,6,0,0"
-                                       Stroke="{DynamicResource AppBorderBrush}" StrokeThickness="1">
-                                <Rectangle.Fill>
-                                    <MultiBinding Converter="{StaticResource ColorConverter}">
-                                        <Binding ElementName="BorderRSlider" Path="Value"/>
-                                        <Binding ElementName="BorderGSlider" Path="Value"/>
-                                        <Binding ElementName="BorderBSlider" Path="Value"/>
-                                    </MultiBinding>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </StackPanel>
-                    </DockPanel>
-
-                    <DockPanel Margin="0,0,0,10">
-                        <TextBlock Text="Boxes Colour:" Width="120" VerticalAlignment="Top"
-                                   Foreground="{DynamicResource AppForeground}"/>
-                        <StackPanel Width="300">
-                            <DockPanel Margin="0,0,0,2">
-                                <TextBlock Text="R:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BoxesRSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BoxesRSlider" Minimum="0" Maximum="255" Value="59"
-                                        ValueChanged="BoxesColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <DockPanel Margin="0,0,0,2">
-                                <TextBlock Text="G:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BoxesGSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BoxesGSlider" Minimum="0" Maximum="255" Value="130"
-                                        ValueChanged="BoxesColorSlider_ValueChanged"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock Text="B:" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BoxesBSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BoxesBSlider" Minimum="0" Maximum="255" Value="246"
-                                        ValueChanged="BoxesColorSlider_ValueChanged"/>
-                            </DockPanel>
-
-                            <DockPanel Margin="0,6,0,0">
-                                <TextBlock Text="Fill %" Width="32"/>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BoxesFillSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BoxesFillSlider" Minimum="0" Maximum="100" Value="10"
-                                        ValueChanged="BoxesColorSlider_ValueChanged"/>
-                            </DockPanel>
-
-                            <Rectangle x:Name="BoxesPreview" Height="20" Margin="0,6,0,0"
-                                       StrokeThickness="1" Stroke="{DynamicResource AppBorderBrush}">
-                                <Rectangle.Fill>
-                                    <MultiBinding Converter="{StaticResource ColorConverter}">
-                                        <Binding ElementName="BoxesRSlider" Path="Value"/>
-                                        <Binding ElementName="BoxesGSlider" Path="Value"/>
-                                        <Binding ElementName="BoxesBSlider" Path="Value"/>
-                                    </MultiBinding>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </StackPanel>
-                    </DockPanel>
-
-                    <DockPanel Margin="0,6,0,14">
-                        <TextBlock Text="Border Thickness:" Width="120" VerticalAlignment="Top"
-                                   Foreground="{DynamicResource AppForeground}"/>
-                        <StackPanel Width="300">
-                            <DockPanel>
-                                <TextBox DockPanel.Dock="Right" Margin="6,0,0,0"
-                                         Style="{StaticResource RgbValueBox}"
-                                         Text="{Binding ElementName=BorderThicknessSlider, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}"/>
-                                <Slider x:Name="BorderThicknessSlider"
-                                        Minimum="0" Maximum="4" Value="1"
-                                        ValueChanged="BorderThicknessSlider_ValueChanged"/>
-                            </DockPanel>
-                        </StackPanel>
-                    </DockPanel>
-
-                    <DockPanel Margin="0,0,0,10">
-                        <TextBlock Text="Theme Name:" Width="120" VerticalAlignment="Center"
-                                   Foreground="{DynamicResource AppForeground}"/>
-                        <TextBox x:Name="ThemeNameTextBox" Width="220" Height="22"/>
-                        <Button x:Name="SaveThemeButton" Content="Save Theme" Width="110" Margin="8,0,0,0"
-                                Click="SaveThemeButton_Click"/>
-                        <Button x:Name="ApplyThemeButton" Content="Apply Theme" Width="110" Margin="8,0,0,0"
-                                Click="ApplyThemeButton_Click"/>
-                    </DockPanel>
-                </StackPanel>
-            </ScrollViewer>
-        </GroupBox>
-    </Grid>
+        </ScrollViewer>
+    </GroupBox>
 </UserControl>

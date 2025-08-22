@@ -7,6 +7,9 @@
     <Compile Update="ExtractionPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Theme.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="SettingsPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
