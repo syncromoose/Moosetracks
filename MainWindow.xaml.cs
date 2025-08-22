@@ -17,8 +17,7 @@ namespace MooseTracks
         {
             InitializeComponent(); // XAML now resolves dynamic resources correctly
             EnsureSettingsFolder(); // Ensure settings folder exists
-            ShowExtractionPage();
-            HighlightButton(ExtractionButton);
+            ShowStartupPageFromConfig();
         }
 
 
@@ -32,6 +31,55 @@ namespace MooseTracks
             }
             catch { /* Suppress logging errors */ }
         }
+
+        private void ShowStartupPageFromConfig()
+        {
+            try
+            {
+                string value = "Extraction";
+                if (File.Exists(configFile))
+                {
+                    var line = File.ReadLines(configFile)
+                                   .FirstOrDefault(l => l.StartsWith("StartupPage=", StringComparison.OrdinalIgnoreCase));
+                    if (!string.IsNullOrWhiteSpace(line))
+                        value = line.Substring("StartupPage=".Length).Trim();
+                }
+
+                Log($"StartupPage from config: '{value}'");
+
+                switch ((value ?? "Extraction").ToLowerInvariant())
+                {
+                    case "container":
+                        ShowContainerPage();
+                        HighlightButton(ContainerButton);
+                        break;
+
+                    case "transcoding":
+                        ShowTranscodingPage();
+                        HighlightButton(TranscodingButton);
+                        break;
+
+                    case "settings":
+                        ShowSettingsPage();
+                        HighlightButton(SettingsButton);
+                        break;
+
+                    case "extraction":
+                    default:
+                        ShowExtractionPage();
+                        HighlightButton(ExtractionButton);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"ShowStartupPageFromConfig error: {ex.Message}");
+                ShowExtractionPage();
+                HighlightButton(ExtractionButton);
+            }
+        }
+
+
 
         private void EnsureSettingsFolder()
         {
@@ -50,6 +98,7 @@ namespace MooseTracks
         {
             try
             {
+                if (ContainerButton != null) ContainerButton.Style = (Style)FindResource("AppButtonStyle");
                 if (ExtractionButton != null) ExtractionButton.Style = (Style)FindResource("AppButtonStyle");
                 if (TranscodingButton != null) TranscodingButton.Style = (Style)FindResource("AppButtonStyle");
                 if (SettingsButton != null) SettingsButton.Style = (Style)FindResource("AppButtonStyle");
@@ -74,9 +123,13 @@ namespace MooseTracks
                 Log($"Error in HighlightButton: {ex.Message}");
             }
         }
-        #endregion
 
-        #region Button Click Handlers
+        private void ContainerButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowContainerPage();
+            HighlightButton(ContainerButton);
+        }
+
         private void ExtractionButton_Click(object sender, RoutedEventArgs e)
         {
             ShowExtractionPage();
@@ -98,7 +151,7 @@ namespace MooseTracks
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                "MooseTracks v0.91\n\nDeveloped by Syncromoose\n\nAll rights reserved.\n\n" +
+                "MooseTracks v0.92\n\nDeveloped by Syncromoose\n\nAll rights reserved.\n\n" +
                 "Special Thanks to\nOberje of The Fingerbobs,\nFilm X Desire,\nGetToTheChopper",
                 "About MooseTracks",
                 MessageBoxButton.OK,
@@ -109,6 +162,12 @@ namespace MooseTracks
         #endregion
 
         #region Page Navigation
+        private void ShowContainerPage()
+        {
+            if (MainContentControl != null)
+                MainContentControl.Content = new Views.ContainerPage();
+        }
+
         private void ShowExtractionPage()
         {
             if (MainContentControl != null)

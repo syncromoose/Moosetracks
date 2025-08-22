@@ -68,11 +68,6 @@
             <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
         </Style>
-
-        <!-- Helper: black text item style for ComboBox items -->
-        <Style x:Key="BlackComboItemStyle" TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="Black"/>
-        </Style>
     </UserControl.Resources>
 
     <Grid Margin="10">
@@ -163,8 +158,15 @@
                                   x:Name="SourceFrameRateComboBox"
                                   Width="80"
                                   IsEnabled="False"
-                                  Foreground="Black"
-                                  ItemContainerStyle="{StaticResource BlackComboItemStyle}">
+                                  Foreground="Black">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalContentAlignment"   Value="Center"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+
                             <ComboBoxItem Content="23.976"/>
                             <ComboBoxItem Content="24"/>
                             <ComboBoxItem Content="25"/>
@@ -178,8 +180,15 @@
                                   x:Name="TargetFrameRateComboBox"
                                   Width="80"
                                   IsEnabled="False"
-                                  Foreground="Black"
-                                  ItemContainerStyle="{StaticResource BlackComboItemStyle}">
+                                  Foreground="Black">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalContentAlignment"   Value="Center"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+
                             <ComboBoxItem Content="23.976"/>
                             <ComboBoxItem Content="24"/>
                             <ComboBoxItem Content="25"/>
@@ -234,8 +243,15 @@
                     <DockPanel Margin="0,0,0,5">
                         <TextBlock Text="Format:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
                         <ComboBox x:Name="FormatComboBox" Width="120" Height="22"
-                                  Foreground="Black"
-                                  ItemContainerStyle="{StaticResource BlackComboItemStyle}">
+                                  Foreground="Black">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalContentAlignment"   Value="Center"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+
                             <ComboBoxItem Content="wav"/>
                             <ComboBoxItem Content="wav64"/>
                             <ComboBoxItem Content="aac"/>
@@ -253,8 +269,15 @@
                     <DockPanel Margin="0,0,0,5">
                         <TextBlock Text="Bitrate:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
                         <ComboBox x:Name="BitrateComboBox" Width="120" Height="22"
-                                  Foreground="Black"
-                                  ItemContainerStyle="{StaticResource BlackComboItemStyle}"/>
+                                  Foreground="Black">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalContentAlignment"   Value="Center"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
                     </DockPanel>
 
                     <!-- Gain row -->

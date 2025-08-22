@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Collections.Generic; // NEW: for List<T>
+using System.Collections.Generic;
 
 namespace MooseTracks.Views
 {
@@ -21,11 +21,11 @@ namespace MooseTracks.Views
         private Color foregroundColor = Colors.White;
         private Color borderColor = Color.FromRgb(255, 165, 0);
 
-        // NEW: Boxes colour (drives all GroupBoxes + FFmpeg area)
+        // Boxes colour (drives all GroupBoxes + FFmpeg area)
         private Color boxesColor = Color.FromRgb(59, 130, 246); // #3B82F6 default
         private double boxesFillPercent = 10.0; // 0..100 -> BoxesBackgroundBrush.Opacity
 
-        // NEW: Border thickness (uniform) 0..4
+        // Border thickness (uniform) 0..4
         private double borderThickness = 1.0;
 
         private bool isInitialized; // Flag to prevent premature event handling
@@ -37,19 +37,30 @@ namespace MooseTracks.Views
             {
                 InitializeComponent();
                 Log("InitializeComponent completed");
+
                 EnsureSettingsFolder();
                 Log("EnsureSettingsFolder completed");
+
+                // NEW: Startup page combo (items + selection from config)
+                EnsureStartupComboItems();
+                LoadStartupDefault();
+                Log("Startup default loaded");
+
                 LoadFFmpegPath();
                 Log("LoadFFmpegPath completed");
+
                 LoadThemeList();
                 Log("LoadThemeList completed");
+
                 LoadCurrentTheme();
                 Log("LoadCurrentTheme completed");
+
                 InitializeSliders();              // includes Boxes sliders now + thickness
                 Log("InitializeSliders completed");
+
                 ApplyTheme(backgroundColor, foregroundColor, borderColor);
                 ApplyBoxesTheme(boxesColor, boxesFillPercent);
-                ApplyBorderThickness(borderThickness); // NEW: push current thickness to resources
+                ApplyBorderThickness(borderThickness); // push current thickness to resources
 
                 isInitialized = true; // set AFTER we’ve applied once
             }
@@ -61,25 +72,103 @@ namespace MooseTracks.Views
             Log("Exiting SettingsPage constructor");
         }
 
+        // ---------- Startup page wiring ----------
+
+        private void EnsureStartupComboItems()
+        {
+            try
+            {
+                // Matches your real pages
+                var items = new[] { "Container", "Extraction", "Transcoding", "Settings" };
+                StartupPageCombo?.Items.Clear();
+                foreach (var i in items) StartupPageCombo?.Items.Add(i);
+                if (StartupPageCombo != null && StartupPageCombo.Items.Count > 0 && StartupPageCombo.SelectedIndex < 0)
+                    StartupPageCombo.SelectedIndex = 1; // default to Extraction
+            }
+            catch (Exception ex)
+            {
+                Log($"Error in EnsureStartupComboItems: {ex.Message}");
+            }
+        }
+
+        private void LoadStartupDefault()
+        {
+            try
+            {
+                if (!File.Exists(configFile)) return;
+
+                var line = File.ReadLines(configFile).FirstOrDefault(l => l.StartsWith("StartupPage=", StringComparison.OrdinalIgnoreCase));
+                var value = line?.Substring("StartupPage=".Length).Trim();
+
+                if (!string.IsNullOrWhiteSpace(value) && StartupPageCombo != null)
+                {
+                    // Pick it if it exists in the combo; else keep current
+                    foreach (var item in StartupPageCombo.Items)
+                    {
+                        if (string.Equals(item?.ToString(), value, StringComparison.OrdinalIgnoreCase))
+                        {
+                            StartupPageCombo.SelectedItem = item;
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Error in LoadStartupDefault: {ex.Message}");
+            }
+        }
+
+        private void SaveStartupButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (StartupPageCombo?.SelectedItem == null)
+                {
+                    MessageBox.Show("Please select a startup page.", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                var chosen = StartupPageCombo.SelectedItem.ToString();
+
+                EnsureSettingsFolder();
+                var lines = File.Exists(configFile)
+                    ? File.ReadAllLines(configFile).ToList()
+                    : new List<string>();
+
+                lines.RemoveAll(l => l.StartsWith("StartupPage=", StringComparison.OrdinalIgnoreCase));
+                lines.Add($"StartupPage={chosen}");
+                File.WriteAllLines(configFile, lines);
+
+                MessageBox.Show($"Startup page set to '{chosen}'.", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                Log($"Saved StartupPage={chosen}");
+            }
+            catch (Exception ex)
+            {
+                Log($"Error in SaveStartupButton_Click: {ex.Message}");
+                MessageBox.Show($"Error saving startup page: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // ---------- Existing wiring below ----------
+
         private void InitializeSliders()
         {
             try
             {
                 Log("Entering InitializeSliders");
 
-                // Try to read current app-wide resources to seed fields (so the UI reflects the active theme)
+                // Seed from app resources
                 if (Application.Current.Resources["AppBackground"] is SolidColorBrush appBg) backgroundColor = appBg.Color;
                 if (Application.Current.Resources["AppForeground"] is SolidColorBrush appFg) foregroundColor = appFg.Color;
                 if (Application.Current.Resources["AppBorderBrush"] is SolidColorBrush appBd) borderColor = appBd.Color;
 
-                // NEW: Also seed Boxes from resources if present
                 if (Application.Current.Resources["BoxesBorderBrush"] is SolidColorBrush b) boxesColor = b.Color;
                 if (Application.Current.Resources["BoxesBackgroundBrush"] is SolidColorBrush bg)
                 {
                     boxesFillPercent = Math.Round(bg.Opacity * 100.0, 1);
                 }
 
-                // NEW: Seed border thickness from resource
                 if (Application.Current.Resources["AppBorderThickness"] is Thickness th)
                 {
                     borderThickness = Clamp(th.Left, 0, 4); // assume uniform
@@ -98,13 +187,13 @@ namespace MooseTracks.Views
                 if (BorderGSlider != null) BorderGSlider.Value = borderColor.G; else Log("BorderGSlider is null");
                 if (BorderBSlider != null) BorderBSlider.Value = borderColor.B; else Log("BorderBSlider is null");
 
-                // NEW: Boxes sliders
+                // Boxes sliders
                 if (BoxesRSlider != null) BoxesRSlider.Value = boxesColor.R; else Log("BoxesRSlider is null");
                 if (BoxesGSlider != null) BoxesGSlider.Value = boxesColor.G; else Log("BoxesGSlider is null");
                 if (BoxesBSlider != null) BoxesBSlider.Value = boxesColor.B; else Log("BoxesBSlider is null");
                 if (BoxesFillSlider != null) BoxesFillSlider.Value = boxesFillPercent; else Log("BoxesFillSlider is null");
 
-                // NEW: Thickness slider
+                // Thickness slider
                 if (BorderThicknessSlider != null) BorderThicknessSlider.Value = borderThickness; else Log("BorderThicknessSlider is null");
 
                 Log("Exiting InitializeSliders");
@@ -376,7 +465,6 @@ namespace MooseTracks.Views
                             Log($"Loaded BorderBrush: {rgb.Value.r},{rgb.Value.g},{rgb.Value.b}");
                         }
                     }
-                    // NEW: Boxes color + fill
                     else if (line.StartsWith("BoxesColor=", StringComparison.OrdinalIgnoreCase))
                     {
                         var rgb = ParseRGB(line.Substring("BoxesColor=".Length));
@@ -399,7 +487,6 @@ namespace MooseTracks.Views
                             Log($"Loaded BoxesFill: {boxesFillPercent}%");
                         }
                     }
-                    // NEW: Border thickness
                     else if (line.StartsWith("BorderThickness=", StringComparison.OrdinalIgnoreCase))
                     {
                         var val = line.Substring("BorderThickness=".Length).Trim();
@@ -412,10 +499,10 @@ namespace MooseTracks.Views
                     }
                 }
 
-                // Apply to live resources immediately so other pages reflect it
+                // Apply immediately
                 ApplyTheme(backgroundColor, foregroundColor, borderColor);
                 ApplyBoxesTheme(boxesColor, boxesFillPercent);
-                ApplyBorderThickness(borderThickness); // NEW
+                ApplyBorderThickness(borderThickness);
 
                 Log($"Exiting LoadThemeFromFile: {themeFile}");
             }
@@ -448,7 +535,6 @@ namespace MooseTracks.Views
                     (byte)(BorderBSlider?.Value ?? 0)
                 );
 
-                // Apply immediately (replace, on UI thread)
                 ReplaceBrush("AppBackground", backgroundColor);
                 ReplaceBrush("AppForeground", foregroundColor);
                 ReplaceBrush("AppBorderBrush", borderColor);
@@ -463,7 +549,6 @@ namespace MooseTracks.Views
             }
         }
 
-        // NEW: border thickness slider handler
         private void BorderThicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!isInitialized) { Log("BorderThicknessSlider_ValueChanged skipped: not initialized"); return; }
@@ -482,7 +567,6 @@ namespace MooseTracks.Views
             }
         }
 
-        // NEW: Handles Boxes R/G/B and Fill% sliders — applies immediately app-wide
         private void BoxesColorSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!isInitialized) { Log("BoxesColorSlider_ValueChanged skipped: not initialized"); return; }
@@ -531,13 +615,10 @@ namespace MooseTracks.Views
         {
             try
             {
-                Directory.CreateDirectory(settingsFolder); // Ensure folder exists
+                Directory.CreateDirectory(settingsFolder);
                 File.AppendAllText(logFile, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}");
             }
-            catch
-            {
-                // If logging fails, silently ignore (optional)
-            }
+            catch { /* ignore logging errors */ }
         }
 
         private void SaveThemeButton_Click(object sender, RoutedEventArgs e)
@@ -564,16 +645,11 @@ namespace MooseTracks.Views
                     $"BorderBrush={borderColor.R},{borderColor.G},{borderColor.B}",
                     $"BoxesColor={boxesColor.R},{boxesColor.G},{boxesColor.B}",
                     $"BoxesFill={boxesFillPercent:F1}",
-                    // NEW: persist thickness as integer 0-4
                     $"BorderThickness={Math.Round(borderThickness):F0}"
                 });
 
                 LoadThemeList();
-
-                if (ThemeComboBox != null)
-                {
-                    ThemeComboBox.SelectedItem = themeName;
-                }
+                if (ThemeComboBox != null) ThemeComboBox.SelectedItem = themeName;
 
                 Log($"Saved theme: {themeName}");
                 MessageBox.Show($"Theme '{themeName}' saved successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -605,13 +681,12 @@ namespace MooseTracks.Views
                     $"BorderBrush={borderColor.R},{borderColor.G},{borderColor.B}",
                     $"BoxesColor={boxesColor.R},{boxesColor.G},{boxesColor.B}",
                     $"BoxesFill={boxesFillPercent:F1}",
-                    // NEW:
                     $"BorderThickness={Math.Round(borderThickness):F0}"
                 });
 
                 ApplyTheme(backgroundColor, foregroundColor, borderColor);
-                ApplyBoxesTheme(boxesColor, boxesFillPercent); // NEW: push boxes to app resources
-                ApplyBorderThickness(borderThickness);         // NEW: push thickness to app resources
+                ApplyBoxesTheme(boxesColor, boxesFillPercent);
+                ApplyBorderThickness(borderThickness);
 
                 Log($"Applied theme: {themeName}");
                 MessageBox.Show("Theme applied successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -666,14 +741,12 @@ namespace MooseTracks.Views
             }
         }
 
-        // NEW: apply uniform border thickness to theme resource
         private void ApplyBorderThickness(double t)
         {
             var v = Clamp(Math.Round(t), 0, 4);
             ReplaceResource("AppBorderThickness", new Thickness(v));
             ReplaceResource("AppBorderStrokeThickness", v);
 
-            // Also update merged theme dictionary if present
             foreach (var dict in Application.Current.Resources.MergedDictionaries)
             {
                 if (dict.Contains("AppBorderThickness"))
@@ -686,7 +759,6 @@ namespace MooseTracks.Views
 
         private void ReplaceResource(string key, object value)
         {
-            // Ensure we're on the UI thread when touching Application.Current.Resources
             if (Dispatcher.CheckAccess())
                 Application.Current.Resources[key] = value;
             else
@@ -697,12 +769,10 @@ namespace MooseTracks.Views
         {
             var brush = new SolidColorBrush(color);
             if (opacity.HasValue) brush.Opacity = Math.Max(0.0, Math.Min(1.0, opacity.Value));
-            // Freezing is safe (we always REPLACE, never mutate)
             if (brush.CanFreeze) brush.Freeze();
             ReplaceResource(key, brush);
         }
 
-        // NEW: centralised function to apply boxes theme live
         private void ApplyBoxesTheme(Color color, double fillPercent)
         {
             try
@@ -712,7 +782,7 @@ namespace MooseTracks.Views
 
                 ReplaceBrush("BoxesBorderBrush", color);
                 ReplaceBrush("BoxesBackgroundBrush", color, fill);
-                ReplaceResource("BoxesColor", color); // optional, but handy
+                ReplaceResource("BoxesColor", color);
 
                 Log($"Applied Boxes theme: {color.R},{color.G},{color.B}, Fill {fillPercent}%");
                 Log("Exiting ApplyBoxesTheme");
@@ -725,7 +795,6 @@ namespace MooseTracks.Views
             }
         }
 
-        // NEW: small helpers
         private static double Clamp(double v, double min, double max) =>
             v < min ? min : (v > max ? max : v);
     }

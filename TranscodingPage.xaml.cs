@@ -16,6 +16,10 @@ namespace MooseTracks.Views
     {
         private readonly FFmpegRunner _ffmpegRunner;
 
+        // NEW: track output path behavior
+        private bool _outputManuallySet = false;
+        private bool _settingOutputProgrammatically = false;
+
         public TranscodingPage()
         {
             InitializeComponent();
@@ -33,6 +37,13 @@ namespace MooseTracks.Views
             InputFilePathBox.AllowDrop = true;
             InputFilePathBox.PreviewDragOver += (s, e) => { e.Effects = DragDropEffects.Copy; e.Handled = true; };
             InputFilePathBox.Drop += InputFilePathBox_Drop;
+
+            // NEW: detect manual edits to output path so we don't override them
+            OutputPathBox.TextChanged += (s, e) =>
+            {
+                if (_settingOutputProgrammatically) return;
+                _outputManuallySet = !string.IsNullOrWhiteSpace(OutputPathBox.Text);
+            };
 
             // Default disabled FPS controls
             SetFpsControlsEnabled(false);
@@ -72,6 +83,19 @@ namespace MooseTracks.Views
             throw new FileNotFoundException("FFmpeg executable not found in PATH or local folder.");
         }
 
+        // NEW: helper to default output to the input file's folder (unless user chose one)
+        private void SetDefaultOutputFromInput(string inputPath)
+        {
+            if (_outputManuallySet) return;
+
+            var dir = Path.GetDirectoryName(inputPath);
+            if (string.IsNullOrWhiteSpace(dir)) return;
+
+            _settingOutputProgrammatically = true;
+            OutputPathBox.Text = dir;
+            _settingOutputProgrammatically = false;
+        }
+
         // =========================
         // Browse / Drag & Drop
         // =========================
@@ -85,6 +109,10 @@ namespace MooseTracks.Views
             if (dlg.ShowDialog() == true)
             {
                 InputFilePathBox.Text = dlg.FileName;
+
+                // NEW: default output to input folder if user hasn't chosen otherwise
+                SetDefaultOutputFromInput(dlg.FileName);
+
                 LoadFileInfoAndStreams(dlg.FileName);
             }
         }
@@ -96,6 +124,10 @@ namespace MooseTracks.Views
             if (files?.Length > 0)
             {
                 InputFilePathBox.Text = files[0];
+
+                // NEW: default output to input folder if user hasn't chosen otherwise
+                SetDefaultOutputFromInput(files[0]);
+
                 LoadFileInfoAndStreams(files[0]);
             }
         }
@@ -103,9 +135,22 @@ namespace MooseTracks.Views
         private void BrowseOutputButton_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new System.Windows.Forms.FolderBrowserDialog();
+
+            // NEW: start in current output (if valid) else the input's folder, else Documents
+            var inputDir = Path.GetDirectoryName(InputFilePathBox.Text);
+            dlg.SelectedPath = Directory.Exists(OutputPathBox.Text)
+                ? OutputPathBox.Text
+                : (Directory.Exists(inputDir)
+                    ? inputDir
+                    : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                _settingOutputProgrammatically = true;
                 OutputPathBox.Text = dlg.SelectedPath;
+                _settingOutputProgrammatically = false;
+
+                _outputManuallySet = true; // user explicitly chose a folder
             }
         }
 
@@ -201,6 +246,9 @@ namespace MooseTracks.Views
         {
             try
             {
+                // NEW: ensure default output path is set (unless user picked a custom one)
+                SetDefaultOutputFromInput(filePath);
+
                 var (doc, _) = await RunFfprobeAsync(filePath);
                 FileNameText.Text = Path.GetFileName(filePath);
                 SizeText.Text = (new FileInfo(filePath).Length / (1024.0 * 1024.0)).ToString("F2") + " MB";
@@ -345,11 +393,23 @@ namespace MooseTracks.Views
             string input = InputFilePathBox.Text;
             string outputDir = OutputPathBox.Text;
 
-            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(outputDir))
+            if (string.IsNullOrWhiteSpace(input))
             {
-                MessageBox.Show("Please choose an input file and an output folder.");
+                MessageBox.Show("Please choose an input file.");
                 return;
             }
+
+            // NEW: safety net — default output to input folder if empty
+            if (string.IsNullOrWhiteSpace(outputDir))
+            {
+                outputDir = Path.GetDirectoryName(input) ?? Environment.CurrentDirectory;
+                _settingOutputProgrammatically = true;
+                OutputPathBox.Text = outputDir;
+                _settingOutputProgrammatically = false;
+            }
+
+            // Ensure the directory exists
+            try { Directory.CreateDirectory(outputDir); } catch { /* ignore */ }
 
             var selectedStreams = ExtractionOutputBox.SelectedItems.Cast<AudioStreamItem>().ToList();
             if (selectedStreams.Count == 0)
