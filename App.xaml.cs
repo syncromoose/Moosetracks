@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using System.Globalization; // for InvariantCulture parsing
 
 namespace MooseTracks
 {
@@ -38,7 +39,7 @@ namespace MooseTracks
 
                 string themeFile = Path.Combine(settingsFolder, $"{themeName}.theme");
 
-                // Defaults (match your app defaults)
+                // Defaults (align with your app’s expected baseline)
                 Color bg = Colors.White;
                 Color fg = Colors.Black;
                 Color br = Colors.Gray;
@@ -46,6 +47,9 @@ namespace MooseTracks
                 // Boxes defaults (same as SettingsPage defaults)
                 Color boxes = Color.FromRgb(59, 130, 246); // #3B82F6
                 double boxesFillPercent = 10.0;            // 0..100
+
+                // Border thickness defaults (layout thickness and overlay stroke)
+                double borderThickness = 1.0;              // 0..4
 
                 if (File.Exists(themeFile))
                 {
@@ -74,35 +78,30 @@ namespace MooseTracks
                         else if (line.StartsWith("BoxesFill=", StringComparison.OrdinalIgnoreCase))
                         {
                             var s = line.Substring("BoxesFill=".Length).Trim();
-                            if (double.TryParse(s, System.Globalization.NumberStyles.Float,
-                                                System.Globalization.CultureInfo.InvariantCulture, out var pct))
+                            if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var pct))
                                 boxesFillPercent = Math.Max(0, Math.Min(100, pct));
+                        }
+                        else if (line.StartsWith("BorderThickness=", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var s = line.Substring("BorderThickness=".Length).Trim();
+                            if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var t))
+                                borderThickness = Math.Max(0, Math.Min(4, Math.Round(t)));
                         }
                     }
                 }
 
                 // Replace resources so {DynamicResource} picks them up
-                var bgBrush = new SolidColorBrush(bg);
-                var fgBrush = new SolidColorBrush(fg);
-                var brBrush = new SolidColorBrush(br);
-                var boxesBorder = new SolidColorBrush(boxes);
-                var boxesBackground = new SolidColorBrush(boxes) { Opacity = boxesFillPercent / 100.0 };
+                ReplaceBrush("AppBackground", bg);
+                ReplaceBrush("AppForeground", fg);
+                ReplaceBrush("AppBorderBrush", br);
 
-                // Freezing is fine since you REPLACE brushes later (you don't mutate them)
-                if (bgBrush.CanFreeze) bgBrush.Freeze();
-                if (fgBrush.CanFreeze) fgBrush.Freeze();
-                if (brBrush.CanFreeze) brBrush.Freeze();
-                if (boxesBorder.CanFreeze) boxesBorder.Freeze();
-                if (boxesBackground.CanFreeze) boxesBackground.Freeze();
+                ReplaceBrush("BoxesBorderBrush", boxes);
+                ReplaceBrush("BoxesBackgroundBrush", boxes, boxesFillPercent / 100.0);
+                Application.Current.Resources["BoxesColor"] = boxes;
 
-                Application.Current.Resources["AppBackground"] = bgBrush;
-                Application.Current.Resources["AppForeground"] = fgBrush;
-                Application.Current.Resources["AppBorderBrush"] = brBrush;
-
-                // NEW: ensure these exist before any page loads
-                Application.Current.Resources["BoxesBorderBrush"] = boxesBorder;
-                Application.Current.Resources["BoxesBackgroundBrush"] = boxesBackground;
-                Application.Current.Resources["BoxesColor"] = boxes; // optional color key
+                // IMPORTANT: set both the layout thickness and the overlay stroke thickness
+                Application.Current.Resources["AppBorderThickness"] = new Thickness(borderThickness);
+                Application.Current.Resources["AppBorderStrokeThickness"] = borderThickness;
             }
             catch (Exception ex)
             {
@@ -110,6 +109,13 @@ namespace MooseTracks
             }
         }
 
+        private static void ReplaceBrush(string key, Color c, double? opacity = null)
+        {
+            var b = new SolidColorBrush(c);
+            if (opacity.HasValue) b.Opacity = Math.Max(0.0, Math.Min(1.0, opacity.Value));
+            if (b.CanFreeze) b.Freeze();
+            Application.Current.Resources[key] = b;
+        }
 
         private (byte r, byte g, byte b)? ParseRGB(string rgb)
         {

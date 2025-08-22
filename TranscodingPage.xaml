@@ -16,21 +16,12 @@
                     <ControlTemplate TargetType="GroupBox">
                         <Border CornerRadius="6"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="1"
+                                BorderThickness="{DynamicResource AppBorderThickness}"
                                 Background="{TemplateBinding Background}"
                                 SnapsToDevicePixels="True">
-                            <!-- Scoped styles so inner controls don't draw extra outlines -->
+                            <!-- Scoped styles to keep inner controls tidy -->
                             <Border.Resources>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                    <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
-                                </Style>
-                                <Style TargetType="ListBox">
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                    <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
-                                </Style>
+                                <!-- Default themed combo look (can be overridden per-control) -->
                                 <Style TargetType="ComboBox">
                                     <Setter Property="BorderThickness" Value="0"/>
                                     <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
@@ -47,7 +38,7 @@
                             <Grid Margin="10">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
                                 <ContentPresenter Grid.Row="0"
@@ -64,6 +55,24 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Reusable themed inputs -->
+        <Style x:Key="ThemedTextBox" TargetType="TextBox">
+            <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
+            <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+        </Style>
+
+        <Style x:Key="ThemedListBox" TargetType="ListBox">
+            <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
+            <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+        </Style>
+
+        <!-- Helper: black text item style for ComboBox items -->
+        <Style x:Key="BlackComboItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="10">
@@ -73,8 +82,8 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <!-- Taller bottom row so FFmpeg area breathes -->
-            <RowDefinition Height="Auto" MinHeight="320"/>
+            <!-- Slightly slimmer bottom row -->
+            <RowDefinition Height="Auto" MinHeight="220"/>
         </Grid.RowDefinitions>
 
         <!-- Left Panel -->
@@ -83,7 +92,10 @@
             <!-- Input File -->
             <GroupBox Header="Input File" Style="{StaticResource SectionGroupBox}">
                 <DockPanel>
-                    <TextBox x:Name="InputFilePathBox" Width="400" IsReadOnly="True"/>
+                    <TextBox x:Name="InputFilePathBox"
+                             Width="400"
+                             IsReadOnly="True"
+                             Style="{StaticResource ThemedTextBox}"/>
                     <Button x:Name="BrowseInputButton" Content="Browse" Width="80" Margin="8,0,0,0"
                             BorderBrush="{DynamicResource AppBorderBrush}"
                             Click="BrowseInputButton_Click"/>
@@ -92,15 +104,20 @@
 
             <!-- File List -->
             <GroupBox Header="File List" Style="{StaticResource SectionGroupBox}">
-                <ListBox x:Name="ExtractionOutputBox" Height="120"
+                <ListBox x:Name="ExtractionOutputBox"
+                         Height="120"
                          SelectionMode="Multiple"
-                         SelectionChanged="ExtractionOutputBox_SelectionChanged"/>
+                         SelectionChanged="ExtractionOutputBox_SelectionChanged"
+                         Style="{StaticResource ThemedListBox}"/>
             </GroupBox>
 
             <!-- Output Path -->
             <GroupBox Header="Output Path" Style="{StaticResource SectionGroupBox}">
                 <DockPanel>
-                    <TextBox x:Name="OutputPathBox" Width="400" IsReadOnly="True"/>
+                    <TextBox x:Name="OutputPathBox"
+                             Width="400"
+                             IsReadOnly="True"
+                             Style="{StaticResource ThemedTextBox}"/>
                     <Button x:Name="BrowseOutputButton" Content="Browse" Width="80" Margin="8,0,0,0"
                             BorderBrush="{DynamicResource AppBorderBrush}"
                             Click="BrowseOutputButton_Click"/>
@@ -142,7 +159,12 @@
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Source FPS:" VerticalAlignment="Center"
                                    Foreground="{DynamicResource AppForeground}" Margin="0,0,5,0"/>
-                        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="SourceFrameRateComboBox" Width="80" IsEnabled="False">
+                        <ComboBox Grid.Row="0" Grid.Column="1"
+                                  x:Name="SourceFrameRateComboBox"
+                                  Width="80"
+                                  IsEnabled="False"
+                                  Foreground="Black"
+                                  ItemContainerStyle="{StaticResource BlackComboItemStyle}">
                             <ComboBoxItem Content="23.976"/>
                             <ComboBoxItem Content="24"/>
                             <ComboBoxItem Content="25"/>
@@ -152,7 +174,12 @@
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Target FPS:" VerticalAlignment="Center"
                                    Foreground="{DynamicResource AppForeground}" Margin="0,0,5,0"/>
-                        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="TargetFrameRateComboBox" Width="80" IsEnabled="False">
+                        <ComboBox Grid.Row="1" Grid.Column="1"
+                                  x:Name="TargetFrameRateComboBox"
+                                  Width="80"
+                                  IsEnabled="False"
+                                  Foreground="Black"
+                                  ItemContainerStyle="{StaticResource BlackComboItemStyle}">
                             <ComboBoxItem Content="23.976"/>
                             <ComboBoxItem Content="24"/>
                             <ComboBoxItem Content="25"/>
@@ -200,12 +227,15 @@
                 </Grid>
             </GroupBox>
 
-            <!-- Format and Gain -->
+            <!-- Format + Bitrate (bitrate moved under format) -->
             <GroupBox Header="Format and Gain" Style="{StaticResource SectionGroupBox}">
                 <StackPanel>
+                    <!-- Format row -->
                     <DockPanel Margin="0,0,0,5">
                         <TextBlock Text="Format:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                        <ComboBox x:Name="FormatComboBox" Width="98" Height="22">
+                        <ComboBox x:Name="FormatComboBox" Width="120" Height="22"
+                                  Foreground="Black"
+                                  ItemContainerStyle="{StaticResource BlackComboItemStyle}">
                             <ComboBoxItem Content="wav"/>
                             <ComboBoxItem Content="wav64"/>
                             <ComboBoxItem Content="aac"/>
@@ -217,13 +247,22 @@
                             <ComboBoxItem Content="ogg"/>
                             <ComboBoxItem Content="opus"/>
                         </ComboBox>
-                        <TextBlock Text="Bitrate:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                        <ComboBox x:Name="BitrateComboBox" Width="90" Margin="5,0,0,0"/>
                     </DockPanel>
+
+                    <!-- Bitrate row (now under format) -->
+                    <DockPanel Margin="0,0,0,5">
+                        <TextBlock Text="Bitrate:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
+                        <ComboBox x:Name="BitrateComboBox" Width="120" Height="22"
+                                  Foreground="Black"
+                                  ItemContainerStyle="{StaticResource BlackComboItemStyle}"/>
+                    </DockPanel>
+
+                    <!-- Gain row -->
                     <DockPanel Margin="0,0,0,5">
                         <TextBlock Text="Gain (dB):" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource AppForeground}"/>
-                        <TextBox x:Name="GainBox" Width="50" Text="0"/>
+                        <TextBox x:Name="GainBox" Width="50" Text="0" Style="{StaticResource ThemedTextBox}"/>
                     </DockPanel>
+
                     <CheckBox x:Name="DownmixCheckBox" Content="Downmix to Stereo" Foreground="{DynamicResource AppForeground}"/>
                 </StackPanel>
             </GroupBox>
@@ -232,17 +271,20 @@
                     Click="TranscodeTracksButton_Click"/>
         </StackPanel>
 
-        <!-- Bottom FFmpeg Output -->
+        <!-- Bottom FFmpeg Output (slimmer) -->
         <GroupBox Header="FFmpeg Output" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
                   Style="{StaticResource SectionGroupBox}"
-                  Margin="0,12,0,0">
+                  Margin="0,8,0,0">
             <StackPanel>
-                <TextBlock Text="Progress:" Foreground="{DynamicResource AppForeground}" Margin="0,0,0,5"/>
-                <ProgressBar x:Name="FFmpegProgressBar" Height="20" Minimum="0" Maximum="100" Value="0"/>
+                <TextBlock Text="Progress:" Foreground="{DynamicResource AppForeground}" Margin="0,0,0,4"/>
+                <ProgressBar x:Name="FFmpegProgressBar" Height="16" Minimum="0" Maximum="100" Value="0"/>
 
-                <TextBlock Text="Output Log:" Foreground="{DynamicResource AppForeground}" Margin="0,10,0,5"/>
-                <TextBox x:Name="FFmpegOutputBox" Height="180"
-                         IsReadOnly="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
+                <TextBlock Text="Output Log:" Foreground="{DynamicResource AppForeground}" Margin="0,6,0,4"/>
+                <TextBox x:Name="FFmpegOutputBox" Height="130"
+                         IsReadOnly="True"
+                         VerticalScrollBarVisibility="Auto"
+                         TextWrapping="Wrap"
+                         Style="{StaticResource ThemedTextBox}"/>
             </StackPanel>
         </GroupBox>
     </Grid>

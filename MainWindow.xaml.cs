@@ -46,48 +46,6 @@ namespace MooseTracks
             }
         }
 
-        private void ApplyThemeToWindow()
-        {
-            try
-            {
-                Log("Entering ApplyThemeToWindow");
-
-                // Apply to MainWindow
-                if (Application.Current.Resources["AppBackground"] is Brush bg)
-                    this.Background = bg;
-                else
-                    this.Background = new SolidColorBrush(Colors.White); // Fallback
-
-                if (Application.Current.Resources["AppForeground"] is Brush fg)
-                    this.Foreground = fg;
-                else
-                    this.Foreground = new SolidColorBrush(Colors.Black); // Fallback
-
-                // Apply to MainContentControl
-                if (MainContentControl != null)
-                {
-                    if (Application.Current.Resources["AppBackground"] is Brush contentBg)
-                        MainContentControl.Background = contentBg;
-                    else
-                        MainContentControl.Background = new SolidColorBrush(Colors.White); // Fallback
-                }
-
-                // Optionally refresh child controls (e.g., pages)
-                if (MainContentControl?.Content is FrameworkElement page)
-                {
-                    page.Resources.MergedDictionaries.Add(Application.Current.Resources);
-                }
-
-                Log("Exiting ApplyThemeToWindow");
-            }
-            catch (Exception ex)
-            {
-                Log($"Error in ApplyThemeToWindow: {ex.Message}");
-            }
-        }
-        #endregion
-
-        #region Button Highlighting
         private void ResetButtonStyles()
         {
             try
@@ -140,7 +98,7 @@ namespace MooseTracks
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                "MooseTracks v0.9\n\nDeveloped by Syncromoose\n\nAll rights reserved.\n\n" +
+                "MooseTracks v0.91\n\nDeveloped by Syncromoose\n\nAll rights reserved.\n\n" +
                 "Special Thanks to\nOberje of The Fingerbobs,\nFilm X Desire,\nGetToTheChopper",
                 "About MooseTracks",
                 MessageBoxButton.OK,

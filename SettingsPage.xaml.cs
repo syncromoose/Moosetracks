@@ -25,6 +25,9 @@ namespace MooseTracks.Views
         private Color boxesColor = Color.FromRgb(59, 130, 246); // #3B82F6 default
         private double boxesFillPercent = 10.0; // 0..100 -> BoxesBackgroundBrush.Opacity
 
+        // NEW: Border thickness (uniform) 0..4
+        private double borderThickness = 1.0;
+
         private bool isInitialized; // Flag to prevent premature event handling
 
         public SettingsPage()
@@ -42,10 +45,11 @@ namespace MooseTracks.Views
                 Log("LoadThemeList completed");
                 LoadCurrentTheme();
                 Log("LoadCurrentTheme completed");
-                InitializeSliders();              // includes Boxes sliders now
+                InitializeSliders();              // includes Boxes sliders now + thickness
                 Log("InitializeSliders completed");
                 ApplyTheme(backgroundColor, foregroundColor, borderColor);
                 ApplyBoxesTheme(boxesColor, boxesFillPercent);
+                ApplyBorderThickness(borderThickness); // NEW: push current thickness to resources
 
                 isInitialized = true; // set AFTER we’ve applied once
             }
@@ -72,8 +76,13 @@ namespace MooseTracks.Views
                 if (Application.Current.Resources["BoxesBorderBrush"] is SolidColorBrush b) boxesColor = b.Color;
                 if (Application.Current.Resources["BoxesBackgroundBrush"] is SolidColorBrush bg)
                 {
-                    // keep colour consistent with border; user controls fill % separately
                     boxesFillPercent = Math.Round(bg.Opacity * 100.0, 1);
+                }
+
+                // NEW: Seed border thickness from resource
+                if (Application.Current.Resources["AppBorderThickness"] is Thickness th)
+                {
+                    borderThickness = Clamp(th.Left, 0, 4); // assume uniform
                 }
 
                 // Existing sliders
@@ -94,6 +103,9 @@ namespace MooseTracks.Views
                 if (BoxesGSlider != null) BoxesGSlider.Value = boxesColor.G; else Log("BoxesGSlider is null");
                 if (BoxesBSlider != null) BoxesBSlider.Value = boxesColor.B; else Log("BoxesBSlider is null");
                 if (BoxesFillSlider != null) BoxesFillSlider.Value = boxesFillPercent; else Log("BoxesFillSlider is null");
+
+                // NEW: Thickness slider
+                if (BorderThicknessSlider != null) BorderThicknessSlider.Value = borderThickness; else Log("BorderThicknessSlider is null");
 
                 Log("Exiting InitializeSliders");
             }
@@ -387,11 +399,23 @@ namespace MooseTracks.Views
                             Log($"Loaded BoxesFill: {boxesFillPercent}%");
                         }
                     }
+                    // NEW: Border thickness
+                    else if (line.StartsWith("BorderThickness=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = line.Substring("BorderThickness=".Length).Trim();
+                        if (double.TryParse(val, out var t))
+                        {
+                            borderThickness = Clamp(Math.Round(t), 0, 4);
+                            if (BorderThicknessSlider != null) BorderThicknessSlider.Value = borderThickness; else Log("BorderThicknessSlider is null in LoadThemeFromFile");
+                            Log($"Loaded BorderThickness: {borderThickness}");
+                        }
+                    }
                 }
 
-                // Apply boxes to live resources immediately so other pages reflect it
+                // Apply to live resources immediately so other pages reflect it
                 ApplyTheme(backgroundColor, foregroundColor, borderColor);
                 ApplyBoxesTheme(boxesColor, boxesFillPercent);
+                ApplyBorderThickness(borderThickness); // NEW
 
                 Log($"Exiting LoadThemeFromFile: {themeFile}");
             }
@@ -439,6 +463,24 @@ namespace MooseTracks.Views
             }
         }
 
+        // NEW: border thickness slider handler
+        private void BorderThicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (!isInitialized) { Log("BorderThicknessSlider_ValueChanged skipped: not initialized"); return; }
+            try
+            {
+                var v = Clamp(Math.Round(e.NewValue), 0, 4);
+                borderThickness = v;
+                ApplyBorderThickness(borderThickness);
+                Log($"Applied border thickness: {borderThickness}");
+            }
+            catch (Exception ex)
+            {
+                Log($"Error in BorderThicknessSlider_ValueChanged: {ex}");
+                MessageBox.Show($"Error updating border thickness: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         // NEW: Handles Boxes R/G/B and Fill% sliders — applies immediately app-wide
         private void BoxesColorSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -463,7 +505,6 @@ namespace MooseTracks.Views
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
 
         private void EnsureSettingsFolder()
         {
@@ -522,7 +563,9 @@ namespace MooseTracks.Views
                     $"Foreground={foregroundColor.R},{foregroundColor.G},{foregroundColor.B}",
                     $"BorderBrush={borderColor.R},{borderColor.G},{borderColor.B}",
                     $"BoxesColor={boxesColor.R},{boxesColor.G},{boxesColor.B}",
-                    $"BoxesFill={boxesFillPercent:F1}"
+                    $"BoxesFill={boxesFillPercent:F1}",
+                    // NEW: persist thickness as integer 0-4
+                    $"BorderThickness={Math.Round(borderThickness):F0}"
                 });
 
                 LoadThemeList();
@@ -560,13 +603,15 @@ namespace MooseTracks.Views
                     $"Background={backgroundColor.R},{backgroundColor.G},{backgroundColor.B}",
                     $"Foreground={foregroundColor.R},{foregroundColor.G},{foregroundColor.B}",
                     $"BorderBrush={borderColor.R},{borderColor.G},{borderColor.B}",
-                    // NEW:
                     $"BoxesColor={boxesColor.R},{boxesColor.G},{boxesColor.B}",
-                    $"BoxesFill={boxesFillPercent:F1}"
+                    $"BoxesFill={boxesFillPercent:F1}",
+                    // NEW:
+                    $"BorderThickness={Math.Round(borderThickness):F0}"
                 });
 
                 ApplyTheme(backgroundColor, foregroundColor, borderColor);
                 ApplyBoxesTheme(boxesColor, boxesFillPercent); // NEW: push boxes to app resources
+                ApplyBorderThickness(borderThickness);         // NEW: push thickness to app resources
 
                 Log($"Applied theme: {themeName}");
                 MessageBox.Show("Theme applied successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -621,6 +666,23 @@ namespace MooseTracks.Views
             }
         }
 
+        // NEW: apply uniform border thickness to theme resource
+        private void ApplyBorderThickness(double t)
+        {
+            var v = Clamp(Math.Round(t), 0, 4);
+            ReplaceResource("AppBorderThickness", new Thickness(v));
+            ReplaceResource("AppBorderStrokeThickness", v);
+
+            // Also update merged theme dictionary if present
+            foreach (var dict in Application.Current.Resources.MergedDictionaries)
+            {
+                if (dict.Contains("AppBorderThickness"))
+                {
+                    dict["AppBorderThickness"] = new Thickness(v);
+                    break;
+                }
+            }
+        }
 
         private void ReplaceResource(string key, object value)
         {
@@ -639,7 +701,6 @@ namespace MooseTracks.Views
             if (brush.CanFreeze) brush.Freeze();
             ReplaceResource(key, brush);
         }
-
 
         // NEW: centralised function to apply boxes theme live
         private void ApplyBoxesTheme(Color color, double fillPercent)
@@ -664,5 +725,8 @@ namespace MooseTracks.Views
             }
         }
 
+        // NEW: small helpers
+        private static double Clamp(double v, double min, double max) =>
+            v < min ? min : (v > max ? max : v);
     }
 }

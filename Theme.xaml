@@ -1,8 +1,9 @@
-﻿<!-- Theme.xaml (in project root) -->
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                
 
-    <!-- Placeholder brushes: replaced at runtime by your code -->
+    <!-- Brushes you already update in code -->
     <SolidColorBrush x:Key="AppBackground" Color="Transparent"/>
     <SolidColorBrush x:Key="AppForeground" Color="Transparent"/>
     <SolidColorBrush x:Key="AppBorderBrush" Color="Transparent"/>
@@ -11,7 +12,12 @@
     <SolidColorBrush x:Key="BoxesBackgroundBrush" Color="Transparent" Opacity="0.0"/>
     <Color x:Key="BoxesColor">#00000000</Color>
 
-    <!-- Make EVERY GroupBox use the clean look (no x:Key -> global) -->
+    <!-- Your slider writes to this Thickness -->
+    <Thickness x:Key="AppBorderThickness">1</Thickness>
+    <!-- Stroke for the visual overlay (use sys:Double, not x:Double) -->
+    <sys:Double x:Key="AppBorderStrokeThickness">1</sys:Double>
+    
+        <!-- Global GroupBox: real border = 1 (stable), visual stroke overlays (no layout shift) -->
     <Style TargetType="GroupBox">
         <Setter Property="Foreground" Value="{DynamicResource AppForeground}"/>
         <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
@@ -21,7 +27,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="GroupBox">
                     <Grid>
-                        <!-- Outer rounded panel -->
+                        <!-- Stable inner -->
                         <Border CornerRadius="6"
                     BorderBrush="{TemplateBinding BorderBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}"
@@ -30,46 +36,25 @@
 
                         <!-- Header chip -->
                         <Border Background="{DynamicResource AppBackground}"
-        TextElement.Foreground="{DynamicResource AppForeground}"
-        Padding="4,0"
-        HorizontalAlignment="Left"
-        Margin="12,0,0,0">
-                            <ContentPresenter ContentSource="Header"
-                    Margin="0"
-                    VerticalAlignment="Center"/>
+                    TextElement.Foreground="{DynamicResource AppForeground}"
+                    Padding="4,0" HorizontalAlignment="Left" Margin="12,0,0,0">
+                            <ContentPresenter ContentSource="Header" VerticalAlignment="Center"/>
                         </Border>
-
 
                         <!-- Content -->
                         <ContentPresenter Margin="12,18,12,12"/>
+
+                        <!-- Visual stroke overlay (doesn't affect layout) -->
+                        <Rectangle RadiusX="6" RadiusY="6"
+                       IsHitTestVisible="False"
+                       Stroke="{DynamicResource AppBorderBrush}"
+                       StrokeThickness="{DynamicResource AppBorderStrokeThickness}"
+                       Margin="0,10,0,0"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!-- Reusable border section (e.g., FFmpeg panel) -->
-    <Style x:Key="SectionBorder" TargetType="Border">
-        <Setter Property="CornerRadius" Value="6"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-        <Setter Property="Padding" Value="12"/>
-        <Setter Property="Margin" Value="0,10,0,0"/>
-    </Style>
-
-    <!-- Optional: remove inner borders inside sections for a single, clean outline -->
-    <Style TargetType="TextBox">
-        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-    </Style>
-    <Style TargetType="ComboBox">
-        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-    </Style>
-    <Style TargetType="ListBox">
-        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-        <Setter Property="Background" Value="{DynamicResource BoxesBackgroundBrush}"/>
-    </Style>
-
+    <!-- Remove the old SectionBorder ControlTemplate. If you had one, delete it. -->
 </ResourceDictionary>
