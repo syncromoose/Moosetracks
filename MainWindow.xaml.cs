@@ -151,7 +151,7 @@ namespace MooseTracks
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                "MooseTracks v0.92\n\nDeveloped by Syncromoose\n\nAll rights reserved.\n\n" +
+                "MooseTracks v0.93\n\nDeveloped by Syncromoose\n\nAll rights reserved.\n\n" +
                 "Special Thanks to\nOberje of The Fingerbobs,\nFilm X Desire,\nGetToTheChopper",
                 "About MooseTracks",
                 MessageBoxButton.OK,
